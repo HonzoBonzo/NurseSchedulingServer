@@ -1,4 +1,4 @@
-###install dependencies:
+### install dependencies:
 $ npm install
-###run server:
+### run server:
 $ node app.js
