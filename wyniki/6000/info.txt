@@ -1,0 +1,6 @@
+SC: 1. Nurse: 13 shift: 28
+SC: 1. Nurse: 9 shift: 56
+SC: 3. Nurse: 5shift: 79
+SC: 1. Nurse: 14 shift: 84
+SC: 3. Nurse: 9shift: 95
+SC: 1. Nurse: 6 shift: 112
