@@ -7,7 +7,8 @@ module.exports = {
 	getFilePath: getFilePath,
 	getShiftSignature: getShiftSignature,
 	getDayId: getDayId,
-	getNursesNames: getNursesNames
+	getNursesNames: getNursesNames,
+	getNurseNameById: getNurseNameById
 }
 
 function parseTxtToJson() {
@@ -45,7 +46,7 @@ function getDayId(number) { // 0 - 34
 
 function getNursesNames() {
 	return [
-		'Nora',
+		'Magda',
 		'Pola',
 		'Basia',
 		'Kasia',
@@ -62,4 +63,10 @@ function getNursesNames() {
 		'Natalia',
 		'Weronika'
 	];
+}
+
+function getNurseNameById(id) {
+	const names = getNursesNames()
+	const name = names[id];
+	return name;
 }

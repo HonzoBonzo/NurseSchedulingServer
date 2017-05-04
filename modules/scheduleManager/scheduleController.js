@@ -48,7 +48,7 @@ function getResultJson(req, res, next) {
 			++i;
 			return {
 				nurseId: i,
-				name: 'Baśka'+i,
+				name: scheduleService.getNurseNameById(i),
 				days: row 
 			}
 		})
@@ -94,6 +94,7 @@ function _makeFullDay(dayId, tab) {
 	var k = 0;	
 	var tabForThisDay = tabForThisDay.map(nurse => {
 		return {
+			nurseName: scheduleService.getNurseNameById(k),
 			nurseId: k++,
 			signature: nurse[0].signature
 		}
