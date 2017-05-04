@@ -6,7 +6,8 @@ module.exports = {
 	parseTxtToJson: parseTxtToJson,
 	getFilePath: getFilePath,
 	getShiftSignature: getShiftSignature,
-	getDayId: getDayId
+	getDayId: getDayId,
+	getNursesNames: getNursesNames
 }
 
 function parseTxtToJson() {
@@ -42,3 +43,23 @@ function getDayId(number) { // 0 - 34
 	return _.floor(number/4);
 }
 
+function getNursesNames() {
+	return [
+		'Nora',
+		'Pola',
+		'Basia',
+		'Kasia',
+		'Ania',
+		'Kamila',
+		'Katarzyna',
+		'Beata',
+		'Ewa',
+		'Blanka',
+		'Bożena',
+		'Tamara',
+		'Teresa',
+		'Nina',
+		'Natalia',
+		'Weronika'
+	];
+}
