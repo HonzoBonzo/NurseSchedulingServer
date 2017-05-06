@@ -28,8 +28,18 @@ function getDaysJson(req, res, next) {
 	data = _stringToTable(data);
 	data = _tableToDaysWithSignatures(data);
 	data = _tableToDaysJson(data);
+	data = _sortByShiftSignatures(data);
 	// console.log(data)
 	res.send(data);
+}
+
+function _sortByShiftSignatures(data) {
+	return _.map(data, day => {
+		return {
+			dayId: day.dayId,
+			shifts: _.sortBy(day.shifts, shift => shift.signature)
+		}
+	})	
 }
 
 function getResultJson(req, res, next) {
