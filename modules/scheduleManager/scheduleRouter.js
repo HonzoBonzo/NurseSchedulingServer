@@ -8,5 +8,6 @@ scheduleManagerRouter.get('/results/', scheduleController.getResultJson);
 scheduleManagerRouter.get('/nurses/', scheduleController.getNurses);
 scheduleManagerRouter.get('/days/', scheduleController.getDaysJson);
 scheduleManagerRouter.get('/constraints/', constraintsController.getConstraints);
+scheduleManagerRouter.get('/2/', constraintsController.checkHardConsTwo);
 
 module.exports = scheduleManagerRouter;
