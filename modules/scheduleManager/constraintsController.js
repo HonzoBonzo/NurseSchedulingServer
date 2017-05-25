@@ -43,8 +43,7 @@ var temp = {
 
 module.exports = {
 	getConstraints: getConstraints,
-  checkHardConsThree: checkHardConsThree,
-  getNursesTime: getNursesTime
+  checkHardConsNine: checkHardConsTen,
 }
 
 function getConstraints(req, res, next) {
@@ -57,9 +56,11 @@ function getConstraints(req, res, next) {
         checkHardConsThree(),
         checkHardConsFour(),
         5,
-        6,
+        checkHardConsSix(),
         7,
         8,
+        checkHardConsNine(),
+        checkHardConsTen()
       ]
     },
     {
@@ -164,18 +165,8 @@ function checkHardConsThree() {
     }
 
     switch (oneNurse){
-      case 0:
-      case 1:
-      case 2:
-      case 3:
-      case 4:
-      case 5:
-      case 6:
-      case 7:
-      case 8:
-      case 9:
-      case 10:
-      case 11:
+      case 0: case 1: case 2: case 3: case 4: case 5: 
+      case 6: case 7: case 8: case 9: case 10: case 11:
         if (nurseHours > 184){
           consFailed++;
         }
@@ -185,9 +176,7 @@ function checkHardConsThree() {
           consFailed++;
         }
         break;
-      case 13:
-      case 14:
-      case 15:
+      case 13: case 14: case 15:
         if (nurseHours > 104){
           consFailed++;
         }
@@ -209,7 +198,7 @@ function checkHardConsFour() {
 
     for(var oneShift = 0; oneShift < shifts; oneShift++){
       if ((oneShift % 4 == 3) && (nurseShifts[oneNurse][oneShift] == 1)){
-        nightShifts++;
+
       }
     }
     if (nightShifts > 3){
@@ -219,17 +208,103 @@ function checkHardConsFour() {
   return consFailed;
 }
 
-function getNursesTime(req, res, next){
-  let temp = []
-  for(var index = 0; index < nurseShifts.length; index++){
-    let tempp = 0
-    for(var j = 0; j< nurseShifts[index].length; j++){
-      if (nurseShifts[index][j] == 1){
-        tempp++;
+function checkHardConsFive(req, res, next) {
+  return 5;
+}
+
+function checkHardConsSix() {
+  // Following a series of at least 2 consecutive night shifts a 42 hours rest is required.
+  var shifts = nurseShifts[0].length;
+  var nurses = nurseShifts.length;
+  let consFailed = 0;
+  let isRestPeriod = false;
+  
+  for(var oneNurse = 0; oneNurse < nurses; oneNurse++){
+    let consecutiveNightShifts = 0;
+    let consecutiveRestShifts = 0;
+
+    for(var oneShift = 0; oneShift < shifts; oneShift++){
+      if (isRestPeriod){
+        if (nurseShifts[oneNurse][oneShift] == 0){
+          consecutiveRestShifts++;
+        }else{
+          if(consecutiveRestShifts < 8){
+            consFailed++;
+          }
+          isRestPeriod = false;         
+        }
+      }
+      
+      if (oneShift % 4 == 3){
+        if (nurseShifts[oneNurse][oneShift] === 1){
+          consecutiveNightShifts++;
+        }else{
+          if(consecutiveNightShifts > 1){
+            isRestPeriod = true;
+            oneShift -= 4;
+          }
+          consecutiveNightShifts = 0;
+        }        
       }
     }
-    temp[index] = tempp;
+    
   }
+  return consFailed;
+}
+function checkHardConsNine() {
+  //The number of consecutive nightshifts is at most 3.
+  var shifts = nurseShifts[0].length;
+  var nurses = nurseShifts.length;
+  let consFailed = 0;
 
-  res.send(temp);
+  for(var oneNurse = 0; oneNurse < nurses; oneNurse++){
+    let consecutiveNightShifts = 0;
+    for(var oneShift = 0; oneShift < shifts; oneShift++){ 
+      if (oneShift % 4 == 3){
+        if (nurseShifts[oneNurse][oneShift] === 1){
+          consecutiveNightShifts++;          
+        }else{
+          if (consecutiveNightShifts > 3){
+            consFailed++;
+          }
+          consecutiveNightShifts = 0;
+        } 
+      }
+    }
+  }
+  return consFailed;
+}
+
+function checkHardConsTen() {
+  //The number of consecutive shifts (workdays) is at most 6
+  var shifts = nurseShifts[0].length;
+  var nurses = nurseShifts.length;
+  let consFailed = 0;  
+
+  for(var oneNurse = 0; oneNurse < nurses; oneNurse++){
+    let hasDayShift = false;
+    let consecutiveDays = 0;
+
+    for(var oneShift = 0; oneShift < shifts; oneShift++){ 
+
+      if ((oneShift % 4 == 0) && (oneShift != 0)){
+
+        if (hasDayShift){
+          consecutiveDays++;
+          hasDayShift = false;
+        }else{
+
+          if(consecutiveDays > 6){
+            consFailed++;
+          }
+          consecutiveDays = 0;
+        }
+      }
+
+      if (nurseShifts[oneNurse][oneShift] == 1){
+        hasDayShift = true;
+      }
+    }
+  }
+  return consFailed;
 }
