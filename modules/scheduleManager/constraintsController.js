@@ -80,7 +80,7 @@ function getConstraints(req, res, next) {
 }
 
 function getShifts(){
-  const filePath = './wyniki/5000/tab.txt';
+  const filePath = './wyniki/good/tab.txt';
   let digitRows = [];
 
   let test = fs.readFile(filePath, 'utf8', function(err, data) {
@@ -156,35 +156,44 @@ function checkHardConsThree() {
   let consFailed = 0;
 
   for(var oneNurse = 0; oneNurse < nurses; oneNurse++){
-    let nurseHours = 0;
 
-    for(var oneShift = 0; oneShift < shifts ; oneShift++){
-      if (nurseShifts[oneNurse][oneShift] == 1){
-        nurseHours += 8;
-      }
+    if (_getHoursFromTable(oneNurse, 0, shifts - 28) > _getAllowedHours(oneNurse)){
+      consFailed++;
     }
-
-    switch (oneNurse){
-      case 0: case 1: case 2: case 3: case 4: case 5: 
-      case 6: case 7: case 8: case 9: case 10: case 11:
-        if (nurseHours > 184){
-          consFailed++;
-        }
-        break;
-      case 12:
-        if (nurseHours > 164){
-          consFailed++;
-        }
-        break;
-      case 13: case 14: case 15:
-        if (nurseHours > 104){
-          consFailed++;
-        }
-        break;
+    if (_getHoursFromTable(oneNurse, 27, shifts) > _getAllowedHours(oneNurse)){
+      consFailed++;
     }
-    
   }
   return consFailed;
+}
+
+function _getHoursFromTable(nurse, from, to){
+  let nurseHours = 0;
+  let consFailed = 0;
+
+  for(var oneShift = from; oneShift < to; oneShift++){
+    if (nurseShifts[nurse][oneShift] == 1){
+      nurseHours += 8;
+    }
+  }
+
+  return nurseHours;
+}
+
+function _getAllowedHours(nurse){
+  let nurseHours = 0;
+    
+    switch (nurse){
+      case 0: case 1: case 2: case 3: case 4: case 5: 
+      case 6: case 7: case 8: case 9: case 10: case 11:
+        return 184;
+      case 12:
+        return 164;
+      case 13: case 14: case 15:
+        return 104;
+      default:
+        throw err;
+    }
 }
 
 function checkHardConsFour() {
@@ -194,18 +203,25 @@ function checkHardConsFour() {
   let consFailed = 0;
   
   for(var oneNurse = 0; oneNurse < nurses; oneNurse++){
-    let nightShifts = 0;
-
-    for(var oneShift = 0; oneShift < shifts; oneShift++){
-      if ((oneShift % 4 == 3) && (nurseShifts[oneNurse][oneShift] == 1)){
-
-      }
+    if(_getNumberOfNightShifts(oneNurse,0,shifts - 28) > 3){
+      consFailed++;
     }
-    if (nightShifts > 3){
+    if(_getNumberOfNightShifts(oneNurse,27,shifts) > 3){
       consFailed++;
     }
   }
   return consFailed;
+}
+
+function _getNumberOfNightShifts(nurse, from, to){
+  let nightShifts = 0;
+
+  for(var oneShift = from; oneShift < to; oneShift++){
+    if ((oneShift % 4 == 3) && (nurseShifts[nurse][oneShift] == 1)){
+      nightShifts++;
+    }
+  }
+  return nightShifts;
 }
 
 function checkHardConsFive(req, res, next) {
