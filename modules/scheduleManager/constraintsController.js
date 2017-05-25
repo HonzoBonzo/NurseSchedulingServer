@@ -43,7 +43,7 @@ var temp = {
 
 module.exports = {
 	getConstraints: getConstraints,
-  checkHardConsNine: checkHardConsTen,
+  checkHardConsNine: checkHardConsFive,
 }
 
 function getConstraints(req, res, next) {
@@ -55,7 +55,7 @@ function getConstraints(req, res, next) {
         checkHardConsTwo(),
         checkHardConsThree(),
         checkHardConsFour(),
-        5,
+        checkHardConsFive(),
         checkHardConsSix(),
         7,
         8,
@@ -224,8 +224,43 @@ function _getNumberOfNightShifts(nurse, from, to){
   return nightShifts;
 }
 
-function checkHardConsFive(req, res, next) {
-  return 5;
+function checkHardConsFive() {
+  /*    A nurse must receive at least 2 weekends off duty per 5 week period. A weekend
+        off duty lasts 60 hours including Saturday 00:00 to Monday 04:00.           */
+  var shifts = nurseShifts[0].length;
+  var nurses = nurseShifts.length;
+  let consFailed = 0;
+  
+
+  for(var oneNurse = 0; oneNurse < nurses; oneNurse++){
+    if(_getCountWeeksOfDuty(oneNurse,28,shifts) < 2){
+      consFailed++;
+    }
+
+    if(_getCountWeeksOfDuty(oneNurse,0,shifts-27) < 2){
+      consFailed++;
+    }
+  }
+  return consFailed;
+}
+
+function _getCountWeeksOfDuty(nurse, from, to){
+  let weeksOfDuty = 0;
+    for(var oneShift = 19 + from; oneShift < to; oneShift += 28){
+      if(_isWeekOfDuty(nurse, oneShift)){
+        weeksOfDuty++
+      }
+    }
+    return weeksOfDuty;
+}
+
+function _isWeekOfDuty(nurse, startShift){
+  for(var oneShift = startShift; oneShift < startShift + 9; oneShift++){
+    if(nurseShifts[nurse][oneShift] != 0){
+      return false;
+    }
+  }
+  return true;
 }
 
 function checkHardConsSix() {
