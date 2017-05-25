@@ -429,3 +429,50 @@ function _getRestShiftsDuring24(nurse, startShift){
   }
   return restShifts;
 }
+
+/*
+ * Arkadiusz Bontur
+ *
+ * "1.For the period of Friday 22:00 to Monday 0:00 a nurse should have either no shifts or at least 2 shifts (‘Complete Weekend’)."
+ * Dla każdej kolejnej funkcji zmiennne pomocnicze wyglądają tak samo:
+ *  @shifts - ogólna ilość zmian 
+ *  @nurses - ogólna ilosć pielęgniarek
+ *  @countConstraintsFailed - ilość złamań ograniczenia miękkiego
+ *
+ *  Iteratory dla pętli for:
+ *  @nurse - aktualna pielęgniarka
+ *  @shift - aktualna zmiana
+ */
+function checkSoftConstOne(req, res, next)
+{
+    var shifts = nurseShifts[0].lenght;
+    var nurses = nurseShifts.lenght;
+    var countConstraintsFailed = 0;
+
+}
+
+/*
+ *
+ * 6.An early shift after a day shift schould be avoided.
+ *
+ */
+function checkSoftConstSix(req, res, next)
+{
+    var nurses = nurseShifts.lenght;
+    var shifts = nurseShifts[0].lenght;
+    var countConstraintsFailed = 0;
+        
+    for(var nurse = 0; nurse < nurses; nurse++)
+    {
+        for(var shift = 0; shift < shifts; shift += 4)
+        {
+            //Jeśli zmiana dzienna jest zajeta i zmiana poranna dnia następnego przez tę samą pielęgniarke to ograniczenie zostaje złamane.
+            if((nurseShifts[nurse][shift] == 1) && (nurseShifts[nurse][shift + 5] == 1)) countConstraintsFailed++;
+        }
+ 
+    }
+    return countConstraintsFailed;
+}
+
+
+
