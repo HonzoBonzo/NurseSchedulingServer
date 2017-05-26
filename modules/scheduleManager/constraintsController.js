@@ -43,7 +43,7 @@ var temp = {
 
 module.exports = {
 	getConstraints: getConstraints,
-  checkHardConsNine: checkHardConsFive,
+  checkHardConsNine: checkHardConsSeven,
 }
 
 function getConstraints(req, res, next) {
@@ -57,7 +57,7 @@ function getConstraints(req, res, next) {
         checkHardConsFour(),
         checkHardConsFive(),
         checkHardConsSix(),
-        7,
+        checkHardConsSeven(),
         8,
         checkHardConsNine(),
         checkHardConsTen()
@@ -169,7 +169,6 @@ function checkHardConsThree() {
 
 function _getHoursFromTable(nurse, from, to){
   let nurseHours = 0;
-  let consFailed = 0;
 
   for(var oneShift = from; oneShift < to; oneShift++){
     if (nurseShifts[nurse][oneShift] == 1){
@@ -302,6 +301,48 @@ function checkHardConsSix() {
   }
   return consFailed;
 }
+
+function checkHardConsSeven() {
+  //During any period of 24 consecutive hours, at least 11 hours of rest is required.
+  var shifts = nurseShifts[0].length;
+  var nurses = nurseShifts.length;
+  let consFailed = 0;
+
+  for(var oneNurse = 0; oneNurse < nurses; oneNurse++){
+    for(var oneShift = 0; oneShift < shifts - 3; oneShift++){
+      if(_getRestShiftsCount(oneNurse,oneShift) < 2){
+        consFailed++;
+      }
+    }
+  }
+
+  return consFailed;
+}
+
+function _getRestShiftsCount(nurse, startShift){
+  let restShifts = 0;
+  for(var oneShift = startShift; oneShift < startShift + 4; oneShift++){
+    if (nurseShifts[nurse][oneShift] == 0){
+      restShifts++;
+    }
+  }
+  return restShifts;
+}
+
+function checkHardConsEight(req, res, next){
+// A night shift has to be followed by at least 14 hours rest. An exception is that once in a
+// period of 21 days for 24 consecutive hours, the resting time may be reduced to 8 hours.
+var shifts = nurseShifts[0].length;
+  var nurses = nurseShifts.length;
+  let consFailed = 0;
+
+  for(var oneNurse = 0; oneNurse < nurses; oneNurse++){
+    for(var oneShift = 0; oneShift < shifts - 3; oneShift++){
+      
+    }
+  }
+}
+
 function checkHardConsNine() {
   //The number of consecutive nightshifts is at most 3.
   var shifts = nurseShifts[0].length;
