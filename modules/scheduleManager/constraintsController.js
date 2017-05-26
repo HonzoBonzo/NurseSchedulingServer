@@ -4,7 +4,7 @@ var scheduleService = require('./scheduleService');
 var fs = require('fs');
 var nurseShifts = getShifts();
 
-var temp = {
+var shiftDemandsPerDay = {
   0: {0: 3,
       1: 3,
       2: 3,
@@ -43,7 +43,7 @@ var temp = {
 
 module.exports = {
 	getConstraints: getConstraints,
-  checkHardConsNine: checkHardConsSeven,
+  checkHardConsNine: checkHardConsEight,
 }
 
 function getConstraints(req, res, next) {
@@ -58,7 +58,7 @@ function getConstraints(req, res, next) {
         checkHardConsFive(),
         checkHardConsSix(),
         checkHardConsSeven(),
-        8,
+        checkHardConsEight(),
         checkHardConsNine(),
         checkHardConsTen()
       ]
@@ -117,7 +117,7 @@ function checkHardConsOne() {
       }
     }
     
-    if (temp[day % 7][oneShift % 4] != nursePerShift){
+    if (shiftDemandsPerDay[day % 7][oneShift % 4] != nursePerShift){
       consFailed++;
     }
   }
@@ -310,7 +310,7 @@ function checkHardConsSeven() {
 
   for(var oneNurse = 0; oneNurse < nurses; oneNurse++){
     for(var oneShift = 0; oneShift < shifts - 3; oneShift++){
-      if(_getRestShiftsCount(oneNurse,oneShift) < 2){
+      if(_getRestShiftsDuring24(oneNurse,oneShift) < 2){
         consFailed++;
       }
     }
@@ -319,7 +319,7 @@ function checkHardConsSeven() {
   return consFailed;
 }
 
-function _getRestShiftsCount(nurse, startShift){
+function _getRestShiftsDuring24(nurse, startShift){
   let restShifts = 0;
   for(var oneShift = startShift; oneShift < startShift + 4; oneShift++){
     if (nurseShifts[nurse][oneShift] == 0){
@@ -329,18 +329,53 @@ function _getRestShiftsCount(nurse, startShift){
   return restShifts;
 }
 
-function checkHardConsEight(req, res, next){
+function checkHardConsEight(){
 // A night shift has to be followed by at least 14 hours rest. An exception is that once in a
 // period of 21 days for 24 consecutive hours, the resting time may be reduced to 8 hours.
 var shifts = nurseShifts[0].length;
   var nurses = nurseShifts.length;
+  var day = 0;
   let consFailed = 0;
 
   for(var oneNurse = 0; oneNurse < nurses; oneNurse++){
-    for(var oneShift = 0; oneShift < shifts - 3; oneShift++){
-      
+    let isExcepAvaible = true;
+    let dayOfException = 0;
+
+    for(var oneShift = 3; oneShift < shifts - 4; oneShift+=4, day++){
+      if ((dayOfException != 0) && (day-dayOfException > 21)){
+        isExcepAvaible = true;
+        dayOfException = 0;
+      }
+
+      if(nurseShifts[oneNurse][oneShift] == 1){
+        var restShifts = _getRestShifts(oneNurse, oneShift);
+        if(restShifts < 2){
+          if (isExcepAvaible){
+            if(restShifts < 1){
+              consFailed++;
+            }
+            isExcepAvaible = false;
+            dayOfException = day;
+          }else{
+            consFailed++;
+          }
+        }
+      }
     }
   }
+  return consFailed;
+}
+
+function _getRestShifts(nurse, startShift){
+  let restShifts = 0;
+  for(var oneShift = startShift + 1; oneShift < startShift + 4; oneShift++){
+    if (nurseShifts[nurse][oneShift] == 0){
+      restShifts++;
+    }else{
+      break;
+    }
+  }
+  return restShifts;
 }
 
 function checkHardConsNine() {
