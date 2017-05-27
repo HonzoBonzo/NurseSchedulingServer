@@ -16,7 +16,7 @@ module.exports = {
 }
 
 function getFilePath() {
-	return './wyniki/5000/tab.txt';
+	return './tab.txt';
 }
 
 function getShiftSignature(number) {
