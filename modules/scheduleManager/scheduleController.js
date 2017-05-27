@@ -2,9 +2,9 @@ var express = require('express');
 var fs = require('fs');
 var _ = require('lodash');
 var scheduleService = require('./scheduleService');
-const SHIFTS_NUMBER = scheduleService.SHIFTS_NUMBER;
+const SHIFTS_NUMBER = scheduleService.SHIFTS_NUMBER_WITH_PREVIOUS_WEEK;
 const NURSE_NUMBER = scheduleService.NURSE_NUMBER;
-const DAYS_NUMBER = scheduleService.DAYS_NUMBER;
+const DAYS_NUMBER = scheduleService.DAYS_NUMBER_WITH_PREVIOUS_WEEK;
 
 module.exports = {
 	getResultJson: getResultJson,
@@ -25,7 +25,7 @@ function getNurses(req, res, next) {
 }
 
 function getDaysJson(req, res, next) {
-	var data =_readFromFile();
+	var data = _readFromFile();
 	data = _stringToTable(data);
 	data = _tableToDaysWithSignatures(data);
 	data = _tableToDaysJson(data);
@@ -43,7 +43,7 @@ function _sortByShiftSignatures(data) {
 }
 
 function getResultJson(req, res, next) {
-	var data =_readFromFile();
+	var data = _readFromFile();
 	data = _stringToTable(data);
 	data = _tableToDaysWithSignatures(data);
 	data = _addNurseNameAndMapRow(data)
@@ -78,7 +78,7 @@ function _tableToDaysWithSignatures(tab) {
 
 function _tableToDaysJson(tab) {
 	var daysJson = [];
-	for(var i = 0; i < 35; i++) {
+	for(var i = 0; i < DAYS_NUMBER; i++) {
 		daysJson.push(_makeFullDay(i, tab));
 	}
 	return daysJson;
@@ -115,7 +115,7 @@ function _makeFullDay(dayId, tab) {
 }
 
 function _stringToTable(string) {
-	var rows = _.split(string, '\r\n', 3000);
+	var rows = _.split(string, '\r\n', 10000);
 	rows = _.map(rows, row => {
 		return _.split(row, ' ', SHIFTS_NUMBER);
 	});
