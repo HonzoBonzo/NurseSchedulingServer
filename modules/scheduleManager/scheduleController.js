@@ -2,6 +2,9 @@ var express = require('express');
 var fs = require('fs');
 var _ = require('lodash');
 var scheduleService = require('./scheduleService');
+const SHIFTS_NUMBER = scheduleService.SHIFTS_NUMBER;
+const NURSE_NUMBER = scheduleService.NURSE_NUMBER;
+const DAYS_NUMBER = scheduleService.DAYS_NUMBER;
 
 module.exports = {
 	getResultJson: getResultJson,
@@ -12,14 +15,12 @@ module.exports = {
 function getNurses(req, res, next) {
 	var i = 0;
 	const nursesNames = scheduleService.getNursesNames();
-
-	var nurses = nursesNames.map(name => {
+	const nurses = nursesNames.map(name => {
 		return {
 			name: name,
 			nurseId: i++
 		}
 	})
-
 	res.send(nurses);
 }
 
@@ -29,7 +30,6 @@ function getDaysJson(req, res, next) {
 	data = _tableToDaysWithSignatures(data);
 	data = _tableToDaysJson(data);
 	data = _sortByShiftSignatures(data);
-	// console.log(data)
 	res.send(data);
 }
 
@@ -43,34 +43,29 @@ function _sortByShiftSignatures(data) {
 }
 
 function getResultJson(req, res, next) {
-	const filePath = scheduleService.getFilePath();
+	var data =_readFromFile();
+	data = _stringToTable(data);
+	data = _tableToDaysWithSignatures(data);
+	data = _addNurseNameAndMapRow(data)
+	res.send(data);
+}
 
-	fs.readFile(filePath, 'utf8', function(err, data) {
-		if (err) {throw err;}
-		console.log("loaded file: ", filePath);
-
-		//parse
-		var rows = _stringToTable(data)
-		rows = _tableToDaysWithSignatures(rows)
-
-		var i = -1;
-		var resultJson = _.map(rows, row => {
-			++i;
-			return {
-				nurseId: i,
-				name: scheduleService.getNurseNameById(i),
-				days: row 
-			}
-		})
-
-		res.send(resultJson);
+function _addNurseNameAndMapRow(data) {
+	var i = -1;
+	return _.map(data, row => {
+		++i;
+		return {
+			nurseId: i,
+			name: scheduleService.getNurseNameById(i),
+			days: row 
+		}
 	})
 }
 
 function _tableToDaysWithSignatures(tab) {
 	return _.map(tab,  row => {
 		var result = [];
-		for (var i = 0; i < 140; i++) {
+		for (var i = 0; i < SHIFTS_NUMBER; i++) {
 			if( row[i] === '1' ) {
 				result.push( _makeDay(i) );
 			} else if( i % 4  === 3 && result[scheduleService.getDayId(i)] === undefined) {
@@ -110,7 +105,7 @@ function _makeFullDay(dayId, tab) {
 		}
 	})
 
-	for(var i = 0; i < 16; ++i) {
+	for(var i = 0; i < NURSE_NUMBER; ++i) {
 		if (tabForThisDay[i].signature !== '0') {
 			day.shifts.push(tabForThisDay[i]);
 		}
@@ -120,9 +115,9 @@ function _makeFullDay(dayId, tab) {
 }
 
 function _stringToTable(string) {
-	var rows = _.split(string, '\r\n', 2240);
+	var rows = _.split(string, '\r\n', 3000);
 	rows = _.map(rows, row => {
-		return _.split(row, ' ', 140);
+		return _.split(row, ' ', SHIFTS_NUMBER);
 	});
 	return rows;
 }
@@ -133,7 +128,7 @@ function _readFromFile() {
 }
 
 function _makeDay(i) {
-	var day = {
+	const day = {
 		dayId: scheduleService.getDayId(i),
 		signature: scheduleService.getShiftSignature(i)
 	}
@@ -141,7 +136,7 @@ function _makeDay(i) {
 }
 
 function _makeBlankDay(i) {
-	var day = {
+	const day = {
 		dayId: scheduleService.getDayId(i),
 		signature: "0"
 	}

@@ -3,16 +3,16 @@ var bodyParser = require('body-parser');
 var _ = require('lodash');
 
 module.exports = {
-	parseTxtToJson: parseTxtToJson,
 	getFilePath: getFilePath,
 	getShiftSignature: getShiftSignature,
 	getDayId: getDayId,
 	getNursesNames: getNursesNames,
-	getNurseNameById: getNurseNameById
-}
-
-function parseTxtToJson() {
-	console.log('testservice')
+	getNurseNameById: getNurseNameById,
+	NURSE_NUMBER: 16,
+	SHIFTS_NUMBER: 140,
+	SHIFTS_NUMBER_WITH_PREVIOUS_WEEK: 168,
+	DAYS_NUMBER: 35,
+	DAYS_NUMBER_WITH_PREVIOUS_WEEK: 42
 }
 
 function getFilePath() {
@@ -20,7 +20,7 @@ function getFilePath() {
 }
 
 function getShiftSignature(number) {
-	var signature = "";
+	var signature = '';
 	switch(number%4) {
 		case 0: 
 			signature = 'E';
@@ -35,7 +35,7 @@ function getShiftSignature(number) {
 			signature = 'N';
 			break;
 		default:
-			signature = "0";
+			signature = '0';
 	}
 	return signature;
 }
@@ -70,3 +70,4 @@ function getNurseNameById(id) {
 	const name = names[id];
 	return name;
 }
+
