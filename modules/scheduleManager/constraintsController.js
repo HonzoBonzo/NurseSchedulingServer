@@ -433,24 +433,90 @@ function _getRestShiftsDuring24(nurse, startShift){
 /*
  * Arkadiusz Bontur
  *
- * "1.For the period of Friday 22:00 to Monday 0:00 a nurse should have either no shifts or at least 2 shifts (‘Complete Weekend’)."
  * Dla każdej kolejnej funkcji zmiennne pomocnicze wyglądają tak samo:
  *  @shifts - ogólna ilość zmian 
  *  @nurses - ogólna ilosć pielęgniarek
- *  @countConstraintsFailed - ilość złamań ograniczenia miękkiego
+ *  @numberOfBrokenConstraints - liczba złamanych ograniceń
  *
  *  Iteratory dla pętli for:
  *  @nurse - aktualna pielęgniarka
  *  @shift - aktualna zmiana
+ * "1.For the period of Friday 22:00 to Monday 0:00 a nurse should have either no shifts or at least 2 shifts (‘Complete Weekend’)."
  */
 function checkSoftConstOne(req, res, next)
 {
-    var shifts = nurseShifts[0].lenght;
-    var nurses = nurseShifts.lenght;
-    var countConstraintsFailed = 0;
+    const shifts = nurseShifts[0].lenght;
+    const nurses = nurseShifts.lenght;
+    var numberOfBrokenConstraints = 0;
 
+    for(let nurse = 0; nurse < nurses; nurse++)
+    {
+        //Zaczynam od zmiany "późnej" ponieważ kończy się o 23
+        for(let shift = 18; shift < shifts; shift += 28)
+        {
+            let sum = 0;
+            //sprawdzam czy w okresie od zmiany "późnej" w piątek do nocnej w niedziele ta konkretna pielęgniarka pracuje 
+            for(let i = 0; i < 10; i++) sum += nurseShifts[nurse][shift];
+            //Jeśli liczba jej zmian jest różna od 0(zera) i mniejsza od 2 to ograniczenie zostaje złamane
+            if((sum != 0) && sum < 2)) numberOfBrokenConstraints += 1;
+        }
+    }
+    return numberOfBrokenConstraints;
 }
+/*
+ *
+ * "4. For employees with availability of 30--‐48 hours per week, the length of a series of shifts should be within the range of 4--‐6."
+ *
+ */
+function checkSoftConstFor(req, res, next)
+{
+    const shifts = nurseShifts[0].lenght;
+    const nurses = nurseShifts.lenght;
+    var numberOfBrokenConstraints = 0;
+    var sum = 0;
+    
+    for(let nurse = 0; nurse < nurses; nurse++)
+    {
+        for(let shift = 0; shift < shifts; shift += 28)
+        {
+            for(let i = shift; i < shift + 28; i++)
+            {
+                if((shift != 0) && (shift % 28)) sum = 0;            
+            }             
+        }
+    }
+}
+/*
+ *
+ * "5. For all employees the length of a series of late shifts should be within the range of 2--‐3. It could be within another series."
+ */
+function checkSoftConstFive(req, res, next)
+{
+    const shifts = nurseShifts[0].lenght;
+    const nurses = nurseShifts.lenght;
+    var numberOfBrokenConstraints = 0;
+    var sum = 0;
+    for(let nurse = 0; nurse < nurses; nurse++)
+    {
+        //Zaczynam od zmiany późnej i kieruję się 3 kolejne dni na przód żeby sprawdzić ile razy pielęgniarka ma zmianę późną
+        for(let shift = 2; shift < shifts; shift += 12)
+        {
+            //Ta seria może wystąpić bespośrednio przed następną więc resetujemy sumę.
+            sum = 0;
+            //Tutaj sprawdzam każdą zmianę wieczorną z kolei
+            for(let i = shift; i <= (shift + 12); i += 4)
+            {
+                //Jeśli pielęgniarka ma zmianę późną to inkrementuje sum
+                if(nurseShifts[nurse][i] === 1) sum++;
+                //Natomiast jeśli nie to seria zostaje przerwana
+                else sum = 0;
+            }
+            if((sum < 2 ) && (sum > 3)) numberOfBrokenConstraints++;
+        }       
+    }
 
+    return numberOfBrokenConstraints;
+}
 /*
  *
  * 6.An early shift after a day shift schould be avoided.
@@ -458,20 +524,20 @@ function checkSoftConstOne(req, res, next)
  */
 function checkSoftConstSix(req, res, next)
 {
-    var nurses = nurseShifts.lenght;
-    var shifts = nurseShifts[0].lenght;
-    var countConstraintsFailed = 0;
+    const nurses = nurseShifts.lenght;
+    const shifts = nurseShifts[0].lenght;
+    var numberOfBrokenConstraints = 0;
         
     for(var nurse = 0; nurse < nurses; nurse++)
     {
         for(var shift = 0; shift < shifts; shift += 4)
         {
             //Jeśli zmiana dzienna jest zajeta i zmiana poranna dnia następnego przez tę samą pielęgniarke to ograniczenie zostaje złamane.
-            if((nurseShifts[nurse][shift] == 1) && (nurseShifts[nurse][shift + 5] == 1)) countConstraintsFailed++;
+            if((nurseShifts[nurse][shift] == 1) && (nurseShifts[nurse][shift + 5] == 1)) numberOfBrokenConstraints++;
         }
  
     }
-    return countConstraintsFailed;
+    return numberOfBrokenConstraints;
 }
 
 
