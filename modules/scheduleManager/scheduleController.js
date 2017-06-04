@@ -43,7 +43,7 @@ function _sortByShiftSignatures(data) {
 }
 
 function getResultJson(req, res, next) {
-	const filePath = scheduleService.getFilePath();
+	//const filePath = scheduleService.getFilePath();
 
 	fs.readFile(filePath, 'utf8', function(err, data) {
 		if (err) {throw err;}
