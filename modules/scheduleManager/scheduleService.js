@@ -52,7 +52,7 @@ function getNursesNames() {
 		'Kasia',
 		'Ania',
 		'Kamila',
-		'Katarzyna',
+		'Irenka',
 		'Beata',
 		'Ewa',
 		'Blanka',

@@ -1,5 +1,6 @@
 var express = require('express');
 var app = express();
+var bodyParser = require('body-parser');
 var scheduleManagerRouter = require('./modules/scheduleManager/scheduleRouter');
 
 app.use(function(req, res, next) {
@@ -12,7 +13,10 @@ app.use(function(req, res, next) {
 app.get('/', function (req, res) {
   res.send('NurseSchedulingServer!')
 })
-
+app.use(bodyParser.urlencoded({
+    extended: true
+}));
+app.use(bodyParser.json());
 app.use(scheduleManagerRouter);
 
 app.listen(3000, function () {
