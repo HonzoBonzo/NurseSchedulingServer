@@ -153,7 +153,7 @@ function checkHardConsThree() {
   for which they are available for their department by at most 4 hours. */
   const shifts = nurseShifts[0].length;
   const nurses = nurseShifts.length;  
-  let consFailed = 0;
+  var consFailed = 0;
 
   for(var oneNurse = 0; oneNurse < nurses; oneNurse++){
 
@@ -171,7 +171,7 @@ function checkHardConsFour() {
   //The maximum number of night shifts is 3 per period of 5 consecutive weeks.
   const shifts = nurseShifts[0].length;
   const nurses = nurseShifts.length;
-  let consFailed = 0;
+  var consFailed = 0;
   
   for(var oneNurse = 0; oneNurse < nurses; oneNurse++){
     if(_getNumberOfNightShifts(oneNurse,0,shifts - 28) > 3){
@@ -188,7 +188,7 @@ function checkHardConsFour() {
 }
 
 function _getNumberOfNightShifts(nurse, from, to){
-  let nightShifts = 0;
+  var nightShifts = 0;
 
   for(var oneShift = from; oneShift < to; oneShift++){
     if ((oneShift % 4 === 3) && (nurseShifts[nurse][oneShift] === 1)){
@@ -203,7 +203,7 @@ function checkHardConsFive() {
         off duty lasts 60 hours including Saturday 00:00 to Monday 04:00.           */
   const shifts = nurseShifts[0].length;
   const nurses = nurseShifts.length;
-  let consFailed = 0;
+  var consFailed = 0;
   
 
   for(var oneNurse = 0; oneNurse < nurses; oneNurse++){
@@ -224,12 +224,12 @@ function checkHardConsSix() {
   // Following a series of at least 2 consecutive night shifts a 42 hours rest is required.
   const shifts = nurseShifts[0].length;
   const nurses = nurseShifts.length;
-  let consFailed = 0;
+  var consFailed = 0;
   
   for(var oneNurse = 0; oneNurse < nurses; oneNurse++){
-    let consecutiveNightShifts = 0;
-    let consecutiveRestShifts = 0;
-    let isRestPeriod = false;
+    var consecutiveNightShifts = 0;
+    var consecutiveRestShifts = 0;
+    var isRestPeriod = false;
 
     for(var oneShift = 0; oneShift < shifts; oneShift++){
       if (isRestPeriod){
@@ -264,7 +264,7 @@ function checkHardConsSeven() {
   //During any period of 24 consecutive hours, at least 11 hours of rest is required.
   const shifts = nurseShifts[0].length;
   const nurses = nurseShifts.length;
-  let consFailed = 0;
+  var consFailed = 0;
 
   for(var oneNurse = 0; oneNurse < nurses; oneNurse++){
     for(var oneShift = 0; oneShift < shifts - 3; oneShift++){
@@ -283,11 +283,11 @@ function checkHardConsEight(){
   const shifts = nurseShifts[0].length;
   const nurses = nurseShifts.length;
   var day = 0;
-  let consFailed = 0;
+  var consFailed = 0;
 
   for(var oneNurse = 0; oneNurse < nurses; oneNurse++){
-    let isExcepAvaible = true;
-    let dayOfException = 0;
+    var isExcepAvaible = true;
+    var dayOfException = 0;
 
     for(var oneShift = 3; oneShift < shifts - 4; oneShift+=4, day++){
       if ((dayOfException !== 0) && (day-dayOfException > 21)){
@@ -318,10 +318,10 @@ function checkHardConsNine() {
   //The number of consecutive nightshifts is at most 3.
   const shifts = nurseShifts[0].length;
   const nurses = nurseShifts.length;
-  let consFailed = 0;
+  var consFailed = 0;
 
   for(var oneNurse = 0; oneNurse < nurses; oneNurse++){
-    let consecutiveNightShifts = 0;
+    var consecutiveNightShifts = 0;
     for(var oneShift = 0; oneShift < shifts; oneShift++){ 
       if (oneShift % 4 === 3){
         if (nurseShifts[oneNurse][oneShift] === 1){
@@ -342,11 +342,11 @@ function checkHardConsTen() {
   //The number of consecutive shifts (workdays) is at most 6
   const shifts = nurseShifts[0].length;
   const nurses = nurseShifts.length;
-  let consFailed = 0;  
+  var consFailed = 0;  
 
   for(var oneNurse = 0; oneNurse < nurses; oneNurse++){
-    let hasDayShift = false;
-    let consecutiveDays = 0;
+    var hasDayShift = false;
+    var consecutiveDays = 0;
 
     for(var oneShift = 0; oneShift < shifts; oneShift++){ 
 
@@ -373,7 +373,7 @@ function checkHardConsTen() {
 }
 
 function _getAllowedHours(nurse){
-  let nurseHours = 0;
+  var nurseHours = 0;
     
     switch (nurse){
       case 0: case 1: case 2: case 3: case 4: case 5: 
@@ -389,7 +389,7 @@ function _getAllowedHours(nurse){
 }
 
 function _getHoursFromTable(nurse, from, to){
-  let nurseHours = 0;
+  var nurseHours = 0;
 
   for(var oneShift = from; oneShift < to; oneShift++){
     if (nurseShifts[nurse][oneShift] === 1){
@@ -401,7 +401,7 @@ function _getHoursFromTable(nurse, from, to){
 }
 
 function _getCountWeeksOfDuty(nurse, from, to){
-  let weeksOfDuty = 0;
+  var weeksOfDuty = 0;
     for(var oneShift = 19 + from; oneShift < to; oneShift += 28){
       if(_isWeekOfDuty(nurse, oneShift)){
         weeksOfDuty++
@@ -420,7 +420,7 @@ function _isWeekOfDuty(nurse, startShift){
 }
 
 function _getRestShiftsDuring24(nurse, startShift){
-  let restShifts = 0;
+  var restShifts = 0;
   for(var oneShift = startShift; oneShift < startShift + 4; oneShift++){
     if (nurseShifts[nurse][oneShift] === 0){
       restShifts++;
