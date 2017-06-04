@@ -103,6 +103,7 @@ function checkHardConsOne() {
   var consFailed = 0;
   var day = 0;
 
+    console.log('[kbujak] Liczba pielęgniarek: ' + nurses);
   for(var oneShift = 0; oneShift < shifts; oneShift++){
     var nursePerShift = 0;
     if ((oneShift % 4 == 0) && (oneShift != 0)){
@@ -730,13 +731,15 @@ function checkHardConsTen() {
  */
 function checkSoftConstOne()
 {
-    const shifts = nurseShifts[0].lenght;
-    const nurses = nurseShifts.lenght;
+
+  const shifts = nurseShifts[0].length;
+  const nurses = nurseShifts.length;  
     var numberOfBrokenConstraints = 0;
 
+    //console.log('+------------------------------------------Ograniczenie miękkie nr. 1------------------------------------------+')
     for(var nurse = 0; nurse < nurses; nurse++)
     {
-        //Zaczynam od zmiany "późnej" ponieważ kończy się o 23
+        //Zaczynam od zmiany "późnej" w piątek ponieważ kończy się o 23
         for(var shift = 18; shift < shifts; shift += 28)
         {
             var begin = shift;
@@ -744,9 +747,15 @@ function checkSoftConstOne()
             //sprawdzam czy w okresie od zmiany "późnej" w piątek do nocnej w niedziele ta konkretna pielęgniarka pracuje 
             for(var i = begin; i < (begin + 10); i++) sum += nurseShifts[nurse][i];
             //Jeśli liczba jej zmian jest różna od 0(zera) i mniejsza od 2 to ograniczenie zostaje złamane
-            if((sum != 0) && (sum < 2)) numberOfBrokenConstraints++ ;
+            if((sum != 0) && (sum < 2))
+            { 
+                //console.log('**Pielęgniarka nr.:' + nurse + ' | ograniczenie złamane w przedziale <' + begin + ', ' + i + '>');
+                numberOfBrokenConstraints++ ;
+            }
         }
     }
+
+    //console.log('+--------------------------------------------------------------------------------------------------------------+')
     return numberOfBrokenConstraints;
 }
 /*
@@ -757,12 +766,13 @@ function checkSoftConstOne()
  */
 function checkSoftConstTwo()
 {
-    const shifts = nurseShifts[0].lenght;
-    const nurses = nurseShifts.lenght;
+  const shifts = nurseShifts[0].length;
+  const nurses = nurseShifts.length;  
     var numberOfBrokenConstraints = 0;
     var sum = 0;
     var subSum = 0;
     var nursesWithAvailabilty = 12 //nurses with availability of <30, 48> hours per week <0, 12>
+    console.log('+------------------------------------------Ograniczenie miękkie nr. 2------------------------------------------+')
     for(var nurse = 0; nurse <= nursesWithAvailabilty; nurse++)
     {
         //Zaczynam od poniedziałkowej zmiany nocnej i kieruję się do niedzielnej zmiany nocnej zeby sprawdzić ile razy pielęgniarka ma zmianę nocną
@@ -773,14 +783,19 @@ function checkSoftConstTwo()
             for(var i = shift; i <= (shift + 24); i += 4)
             {
                 //Zliczam wystąpienia zmian w zmiennej sum
-                sum = sum + nursePerShift[nurse][i];
+                sum = sum + nurseShifts[nurse][i];
                 //Jeśli nie ma zmiany nocnej to oznacza że jest ona równa 0. Pomnożone przez poprzednią wartość daje 0 czyli przerwanie ciągłości zmian
                 subSum = (subSum * nurseShifts[nurse][i]) + nurseShifts[nurse][i];
             }
-            if((sum < 2 ) || (sum > 3)) numberOfBrokenConstraints++;
+            if((sum < 2 ) || (sum > 3))
+            {
+                console.log('**Pielęgniarka nr.:' + nurse + ' | ograniczenie złamane w przedziale <' + shift + ', ' + i + '>');
+                numberOfBrokenConstraints++;
+            }
         }       
     }
 
+    console.log('+--------------------------------------------------------------------------------------------------------------+')
     return numberOfBrokenConstraints;
 
 }
@@ -790,8 +805,8 @@ function checkSoftConstTwo()
  */
 function checkSoftConstThree()
 {
-    const shifts = nurseShifts[0].lenght;
-    const nurses = nurseShifts.lenght;
+  const shifts = nurseShifts[0].length;
+  const nurses = nurseShifts.length;  
     var numberOfBrokenConstraints = 0;
     var nursesWithAvailabilty = 12 //nurses with availability of <30, 48> hours per week <0, 12>
 
@@ -806,7 +821,7 @@ function checkSoftConstThree()
             for(var i = shift; i <= (shift + 27); i++)
             {
                 //Zliczam wystąpienia zmian
-                sum = sum + nursePerShift[nurse][i];
+                sum = sum + nurseShifts[nurse][i];
             }
             //Jeśli suma jest mniejsza od 4 lub większa od 5 to ograniczenie zostaje złamane
             if((sum < 4 ) || (sum > 5)) numberOfBrokenConstraints++;
@@ -823,21 +838,24 @@ function checkSoftConstThree()
  */
 function checkSoftConstFor()
 {
-    const shifts = nurseShifts[0].lenght;
-    const nurses = nurseShifts.lenght;
-    var numberOfBrokenConstraints = 1;
+  const shifts = nurseShifts[0].length;
+  const nurses = nurseShifts.length;  
+    var numberOfBrokenConstraints = 0;
     var sum = 0;
-    var subsum = 0;
+    var subSum = 0;
     var workDays = 0; //dni które upłyneły od ostatnio przerwanej seri zmian
     var restDays = 0;
+    console.log('+------------------------------------------Ograniczenie miękkie nr. 4------------------------------------------+')
     //ta pętla porusza się po pielęgniarkach
     for(var nurse = 0; nurse < nurses; nurse++)
     {
+        var shift = 0;
         while(shift < shifts)
         {
             var i = shift;
-            while(i < 4)
+            while(i < shift + 4)
             {
+                //console.log(i);
                 subSum += nurseShifts[nurse][i];
                 ++i;
             }       
@@ -847,7 +865,13 @@ function checkSoftConstFor()
                 restDays++;
                 if((workDays > 4) || (restDays > 1))
                 {
-                    if((sum < 4) && (sum > 6)) numberOfBrokenConstraints++;
+                    if((sum < 4) || (sum > 6))
+                    {
+                        console.log('**Pielęgniarka nr.:' + nurse + ' | ograniczenie złamane w przedziale <' + shift + ', ' + i + '>');
+                        console.log('**********workDays: ' + workDays);
+                        console.log('**********restDays: ' + restDays);
+                        numberOfBrokenConstraints++;
+                    }
                 }
                 workDays = 0;
                 sum = 0;
@@ -859,9 +883,10 @@ function checkSoftConstFor()
                 sum += subSum;         
             }
 
-            shift += i + 1;
+            shift += i;
         }
     }
+    console.log('+--------------------------------------------------------------------------------------------------------------+')
     return numberOfBrokenConstraints;
 }
 /*
@@ -870,10 +895,12 @@ function checkSoftConstFor()
  */
 function checkSoftConstFive()
 {
-    const shifts = nurseShifts[0].lenght;
-    const nurses = nurseShifts.lenght;
+  const shifts = nurseShifts[0].length;
+  const nurses = nurseShifts.length;  
     var numberOfBrokenConstraints = 0;
     var sum = 0;
+
+    //console.log('+------------------------------------------Ograniczenie miękkie nr. 5------------------------------------------+')
     for(var nurse = 0; nurse < nurses; nurse++)
     {
         //Zaczynam od zmiany późnej i kieruję się 3 kolejne dni na przód żeby sprawdzić ile razy pielęgniarka ma zmianę późną
@@ -889,10 +916,14 @@ function checkSoftConstFive()
                 //Natomiast jeśli nie to seria zostaje przerwana
                 else sum = 0;
             }
-            if((sum < 2 ) && (sum > 3)) numberOfBrokenConstraints++;
+            if((sum < 2 ) || (sum > 3))
+            {
+               // console.log('* Pielęgniarka nr.: ' + nurse + ', ogarniczenie nr. 5 złamne w miejscu zmiany nr.: ' + shift);           
+                numberOfBrokenConstraints++;
+            }
         }       
     }
-
+    //console.log('+--------------------------------------------------------------------------------------------------------------+')
     return numberOfBrokenConstraints;
 }
 /*
@@ -902,19 +933,28 @@ function checkSoftConstFive()
  */
 function checkSoftConstSix()
 {
-    const nurses = nurseShifts.lenght;
-    const shifts = nurseShifts[0].lenght;
+  const shifts = nurseShifts[0].length;
+  const nurses = nurseShifts.length;  
     var numberOfBrokenConstraints = 0;
-        
+    //console.log('+------------------------------------------Ograniczenie miękkie nr. 6------------------------------------------+')
     for(var nurse = 0; nurse < nurses; nurse++)
     {
+        //zmiana 0 oznacza zmianę dzienną, 
         for(var shift = 0; shift < shifts; shift += 4)
         {
-            //Jeśli zmiana dzienna jest zajeta i zmiana poranna dnia następnego przez tę samą pielęgniarke to ograniczenie zostaje złamane.
-            if((nurseShifts[nurse][shift] == 1) && (nurseShifts[nurse][shift + 5] == 1)) numberOfBrokenConstraints++;
+            //Jeśli zmiana dzienna jest zajeta i zmiana wczesna dnia następnego przez tę samą pielęgniarke to ograniczenie zostaje złamane.
+            if((nurseShifts[nurse][shift] === 1) && (nurseShifts[nurse][shift + 5] === 1))
+            {
+                //cconsole.log('* Pielęgniarka nr.: ' + nurse + ', ogarniczenie nr. 6 złamne w miejscu zmiany nr.: ' + shift);           
+                //for(var i = shift; i <= (shift + 5); ++i) console.log('**Zmiana nr.: '+ i + ' | ' + nurseShifts[nurse][i]);
+                //cconsole.log('#################################################################');
+                numberOfBrokenConstraints++;
+            }
         }
  
     }
+
+    //console.log('+--------------------------------------------------------------------------------------------------------------+')
     return numberOfBrokenConstraints;
 }
 
