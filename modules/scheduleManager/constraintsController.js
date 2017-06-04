@@ -4,7 +4,7 @@ var scheduleService = require('./scheduleService');
 var fs = require('fs');
 var nurseShifts = getShifts();
 
-var temp = {
+var shiftDemandsPerDay = {
   0: {0: 3,
       1: 3,
       2: 3,
@@ -43,40 +43,6 @@ var temp = {
 
 module.exports = {
 	getConstraints: getConstraints,
-  checkHardConsTwo: checkHardConsTwo
-}
-
-function getConstraints(req, res, next) {
-  const mockConstraints = [
-    { 
-      failedHardSum: 1,
-      failedHards: [
-        checkHardConsOne(),
-        checkHardConsTwo(),
-        0,
-        0,
-        0,
-        0
-      ]
-    },
-    {
-      failedSoftSum: 123,
-      failedSofts: [
-        934,
-        2567,
-        123,
-        1137,
-        456,
-        235
-      ]
-    }
-  ];
-  
-  res.send(mockConstraints);
-}
-
-module.exports = {
-	getConstraints: getConstraints,
   checkHardConsNine: checkHardConsEight,
 }
 
@@ -100,12 +66,12 @@ function getConstraints(req, res, next) {
     {
       failedSoftSum: 123,
       failedSofts: [
-        934,
-        2567,
-        123,
-        1137,
-        456,
-        235
+        checkSoftConstOne(),
+        checkSoftConstTwo(),
+        checkSoftConstThree(),
+        checkSoftConstFor(),
+        checkSoftConstFive(),
+        checkSoftConstSix()
       ]
     }
   ];
@@ -468,13 +434,13 @@ function checkHardConsTen() {
     }
   }
   return consFailed;
-
+}
 /*
  * Arkadiusz Bontur
  *
  * Dla każdej kolejnej funkcji zmiennne pomocnicze wyglądają tak samo:
  *  @shifts - ogólna ilość zmian 
- *  @nurses - ogólna ilosć pielęgniarek
+ *  @nurses - ogólna ilosć pielęgniarek
  *  @numberOfBrokenConstraints - liczba złamanych ograniceń
  *
  *  Iteratory dla pętli for:
@@ -490,20 +456,55 @@ function checkSoftConstOne()
 
     for(let nurse = 0; nurse < nurses; nurse++)
     {
-        //Zaczynam od zmiany "późnej" ponieważ kończy się o 23
+        //Zaczynam od zmiany "późnej" ponieważ kończy się o 23
         for(let shift = 18; shift < shifts; shift += 28)
         {
             let sum = 0;
             //sprawdzam czy w okresie od zmiany "późnej" w piątek do nocnej w niedziele ta konkretna pielęgniarka pracuje 
-            for(let i = 0; i < 10; i++) sum += nurseShifts[nurse][shift];
+            for(let i = shift; i < 10; i++) sum += nurseShifts[nurse][i];
             //Jeśli liczba jej zmian jest różna od 0(zera) i mniejsza od 2 to ograniczenie zostaje złamane
-            if((sum != 0) && sum < 2)) numberOfBrokenConstraints += 1;
+            if((sum != 0) && (sum < 2)) numberOfBrokenConstraints++ ;
         }
     }
     return numberOfBrokenConstraints;
 }
 /*
- * "3.For employees with availability of 30--‐48 hours per week, within one week the number of shifts is within the range 4--‐5."
+ * "2. For employees with availability of 30--‐48 hours per week, the length of a series of night shifts should be within the range 2--‐3. It could be before another series."
+ *
+ *  @subSum -  oznacza ilość zmian pod rząd
+ *  @sum    -  oznacza łączną ilość zmian w ciągu tygodnia        
+ */
+function checkSoftConstTwo()
+{
+    const shifts = nurseShifts[0].lenght;
+    const nurses = nurseShifts.lenght;
+    var numberOfBrokenConstraints = 0;
+    var sum = 0;
+    var subSum = 0;
+    var nursesWithAvailabilty = 12 //nurses with availability of <30, 48> hours per week <0, 12>
+    for(let nurse = 0; nurse <= nursesWithAvailabilty; nurse++)
+    {
+        //Zaczynam od poniedziałkowej zmiany nocnej i kieruję się do niedzielnej zmiany nocnej zeby sprawdzić ile razy pielęgniarka ma zmianę nocną
+        for(let shift = 3; shift < shifts; shift += 24)
+        {
+            sum = 0;
+            //Tutaj sprawdzam każdą zmianę nocną z kolei
+            for(var i = shift; i <= (shift + 24); i += 4)
+            {
+                //Zliczam wystąpienia zmian w zmiennej sum
+                sum = sum + nursePerShift[nurse][i];
+                //Jeśli nie ma zmiany nocnej to oznacza że jest ona równa 0. Pomnożone przez poprzednią wartość daje 0 czyli przerwanie ciągłości zmian
+                subSum = (subSum * nurseShifts[nurse][i]) + nurseShifts[nurse][i];
+            }
+            if((sum < 2 ) || (sum > 3)) numberOfBrokenConstraints++;
+        }       
+    }
+
+    return numberOfBrokenConstraints;
+
+}
+/*
+ * "3. For employees with availability of 30--‐48 hours per week, within one week the number of shifts is within the range 4--‐5."
  *
  */
 function checkSoftConstThree()
@@ -511,23 +512,24 @@ function checkSoftConstThree()
     const shifts = nurseShifts[0].lenght;
     const nurses = nurseShifts.lenght;
     var numberOfBrokenConstraints = 0;
-    
-    for(let nurse = 0; nurse < nurses; nurse++)
+    var nursesWithAvailabilty = 12 //nurses with availability of <30, 48> hours per week <0, 12>
+
+    for(let nurse = 0; nurse <= nursesWithAvailabilty; nurse++)
     {
-        let subSum = 0;
-        for(let shift = 2; shift < shifts; shift += 28)
+        //Zaczynam od poniedziałkowej zmiany dziennej i kończę na nocnej niedzielnej
+        for(let shift = 0; shift < shifts; shift += 28)
         {
-            var begin = shift;
-            for(var i = shift; i < begin + 28; i += 4)
+            //Przy rozpocząeciu każdego tygodnia zeruję sumę.
+            sum = 0;
+            //Zliczam zmiany od poniedziałku do niedzieli
+            for(var i = shift; i <= (shift + 27); i++)
             {
-                if(nurseShifts[nurse][i] === 1)
-                {
-                    sum += nurseShifts[nurse][i];
-                }
-                else sum = 0;
+                //Zliczam wystąpienia zmian
+                sum = sum + nursePerShift[nurse][i];
             }
-            if(((sum < 4) || (sum > 5)) && (nurseShifts[nurse][i] === nurseShifts[nurse][i + 4] === 1)) numberOfBrokenConstraints++;
-        }
+            //Jeśli suma jest mniejsza od 4 lub większa od 5 to ograniczenie zostaje złamane
+            if((sum < 4 ) || (sum > 5)) numberOfBrokenConstraints++;
+        }       
     }
 
 
@@ -542,31 +544,44 @@ function checkSoftConstFor()
 {
     const shifts = nurseShifts[0].lenght;
     const nurses = nurseShifts.lenght;
-    var numberOfBrokenConstraints = 0;
+    var numberOfBrokenConstraints = 1;
     var sum = 0;
-    
-    //ta pętla porusza się po pielęgniarkach
+    var subsum = 0;
+    var workDays = 0; //dni które upłyneły od ostatnio przerwanej seri zmian
+    var restDays = 0;
+    //ta pętla porusza się po pielęgniarkach
     for(let nurse = 0; nurse < nurses; nurse++)
     {
-        //Ta natomiast po zmianach tych pielęgniarek
-        //2 - oznacza zmianę poźną
-        //shift += 28 oznacza ten sam dzień i zmianę ale tydzień później
-        for(let shift = 2; shift < shifts; shift += 28)
+        while(shift < shifts)
         {
-            var begin = shift;
-            //Tutaj przemierzam cały tydzień i zliczam zmiany późne
-            for(var i = shift; i < begin + 28; i += 4)
+            var i = shift;
+            while(i < 4)
             {
-                if(nurseShifts[nurse][i] === 1)
+                subSum += nurseShifts[nurse][i];
+                ++i;
+            }       
+
+            if(subSum === 0)
+            {
+                restDays++;
+                if((workDays > 4) || (restDays > 1))
                 {
-                    sum += nurseShifts[nurse][i];
+                    if((sum < 4) && (sum > 6)) numberOfBrokenConstraints++;
                 }
-                else sum = 0;
+                workDays = 0;
+                sum = 0;
             }
-            //Jeśli zmian jest mniej niż 4 lub wiecej jak 6 i pielęgniarka ma zmianę w niedzielę oraz w poniedziałek to to ograniczenie zostaje złamane  
-            if(((sum < 4) || (sum > 6)) && (nurseShifts[nurse][i] === nurseShifts[nurse][i + 4] === 1)) numberOfBrokenConstraints++;
+            else
+            {
+                ++workDays;
+                restDays = 0;
+                sum += subSum;         
+            }
+
+            shift += i + 1;
         }
     }
+    return numberOfBrokenConstraints;
 }
 /*
  *
