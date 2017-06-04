@@ -81,14 +81,14 @@ function getConstraints(req, res, next) {
 
 function getShifts(){
   const filePath = './wyniki/good/tab.txt';
-  let digitRows = [];
+  var digitRows = [];
 
-  let test = fs.readFile(filePath, 'utf8', function(err, data) {
+  var test = fs.readFile(filePath, 'utf8', function(err, data) {
 		if (err) {throw err;}
     var rows = data.split("\n", 2000);    
 
     for (var rowIndex = 0; rowIndex < rows.length; rowIndex++) {
-      let oneRow = rows[rowIndex].split(" ", 200);
+      var oneRow = rows[rowIndex].split(" ", 200);
       digitRows[rowIndex] = [];
 
       for(var colIndex = 0; colIndex < oneRow.length - 1; colIndex++){
@@ -102,11 +102,11 @@ function getShifts(){
 function checkHardConsOne() {
   var shifts = nurseShifts[0].length;
   var nurses = nurseShifts.length;  
-  let consFailed = 0;
-  let day = 0;
+  var consFailed = 0;
+  var day = 0;
 
   for(var oneShift = 0; oneShift < shifts; oneShift++){
-    let nursePerShift = 0;
+    var nursePerShift = 0;
     if ((oneShift % 4 == 0) && (oneShift != 0)){
       day++;
     }
@@ -127,10 +127,10 @@ function checkHardConsOne() {
 function checkHardConsTwo() {
   var shifts = nurseShifts[0].length;
   var nurses = nurseShifts.length;
-  let consFailed = 0;
+  var consFailed = 0;
 
   for(var oneNurse = 0; oneNurse < nurses; oneNurse++){
-    let shiftsPerDay = 0; 
+    var shiftsPerDay = 0; 
 
     for(var oneShift = 0; oneShift < shifts; oneShift++){
       if ((oneShift % 4 == 0) && (oneShift != 0)){
@@ -153,7 +153,7 @@ function checkHardConsThree() {
   for which they are available for their department by at most 4 hours. */
   var shifts = nurseShifts[0].length;
   var nurses = nurseShifts.length;  
-  let consFailed = 0;
+  var consFailed = 0;
 
   for(var oneNurse = 0; oneNurse < nurses; oneNurse++){
 
@@ -168,7 +168,7 @@ function checkHardConsThree() {
 }
 
 function _getHoursFromTable(nurse, from, to){
-  let nurseHours = 0;
+  var nurseHours = 0;
 
   for(var oneShift = from; oneShift < to; oneShift++){
     if (nurseShifts[nurse][oneShift] == 1){
@@ -180,7 +180,7 @@ function _getHoursFromTable(nurse, from, to){
 }
 
 function _getAllowedHours(nurse){
-  let nurseHours = 0;
+  var nurseHours = 0;
     
     switch (nurse){
       case 0: case 1: case 2: case 3: case 4: case 5: 
@@ -199,7 +199,7 @@ function checkHardConsFour() {
   //The maximum number of night shifts is 3 per period of 5 consecutive weeks.
   var shifts = nurseShifts[0].length;
   var nurses = nurseShifts.length;
-  let consFailed = 0;
+  var consFailed = 0;
   
   for(var oneNurse = 0; oneNurse < nurses; oneNurse++){
     if(_getNumberOfNightShifts(oneNurse,0,shifts - 28) > 3){
@@ -213,7 +213,7 @@ function checkHardConsFour() {
 }
 
 function _getNumberOfNightShifts(nurse, from, to){
-  let nightShifts = 0;
+  var nightShifts = 0;
 
   for(var oneShift = from; oneShift < to; oneShift++){
     if ((oneShift % 4 == 3) && (nurseShifts[nurse][oneShift] == 1)){
@@ -228,7 +228,7 @@ function checkHardConsFive() {
         off duty lasts 60 hours including Saturday 00:00 to Monday 04:00.           */
   var shifts = nurseShifts[0].length;
   var nurses = nurseShifts.length;
-  let consFailed = 0;
+  var consFailed = 0;
   
 
   for(var oneNurse = 0; oneNurse < nurses; oneNurse++){
@@ -244,7 +244,7 @@ function checkHardConsFive() {
 }
 
 function _getCountWeeksOfDuty(nurse, from, to){
-  let weeksOfDuty = 0;
+  var weeksOfDuty = 0;
     for(var oneShift = 19 + from; oneShift < to; oneShift += 28){
       if(_isWeekOfDuty(nurse, oneShift)){
         weeksOfDuty++
@@ -266,12 +266,12 @@ function checkHardConsSix() {
   // Following a series of at least 2 consecutive night shifts a 42 hours rest is required.
   var shifts = nurseShifts[0].length;
   var nurses = nurseShifts.length;
-  let consFailed = 0;
-  let isRestPeriod = false;
+  var consFailed = 0;
+  var isRestPeriod = false;
   
   for(var oneNurse = 0; oneNurse < nurses; oneNurse++){
-    let consecutiveNightShifts = 0;
-    let consecutiveRestShifts = 0;
+    var consecutiveNightShifts = 0;
+    var consecutiveRestShifts = 0;
 
     for(var oneShift = 0; oneShift < shifts; oneShift++){
       if (isRestPeriod){
@@ -306,7 +306,7 @@ function checkHardConsSeven() {
   //During any period of 24 consecutive hours, at least 11 hours of rest is required.
   var shifts = nurseShifts[0].length;
   var nurses = nurseShifts.length;
-  let consFailed = 0;
+  var consFailed = 0;
 
   for(var oneNurse = 0; oneNurse < nurses; oneNurse++){
     for(var oneShift = 0; oneShift < shifts - 3; oneShift++){
@@ -320,7 +320,7 @@ function checkHardConsSeven() {
 }
 
 function _getRestShiftsDuring24(nurse, startShift){
-  let restShifts = 0;
+  var restShifts = 0;
   for(var oneShift = startShift; oneShift < startShift + 4; oneShift++){
     if (nurseShifts[nurse][oneShift] == 0){
       restShifts++;
@@ -335,11 +335,11 @@ function checkHardConsEight(){
 var shifts = nurseShifts[0].length;
   var nurses = nurseShifts.length;
   var day = 0;
-  let consFailed = 0;
+  var consFailed = 0;
 
   for(var oneNurse = 0; oneNurse < nurses; oneNurse++){
-    let isExcepAvaible = true;
-    let dayOfException = 0;
+    var isExcepAvaible = true;
+    var dayOfException = 0;
 
     for(var oneShift = 3; oneShift < shifts - 4; oneShift+=4, day++){
       if ((dayOfException != 0) && (day-dayOfException > 21)){
@@ -367,7 +367,7 @@ var shifts = nurseShifts[0].length;
 }
 
 function _getRestShifts(nurse, startShift){
-  let restShifts = 0;
+  var restShifts = 0;
   for(var oneShift = startShift + 1; oneShift < startShift + 4; oneShift++){
     if (nurseShifts[nurse][oneShift] == 0){
       restShifts++;
@@ -382,10 +382,10 @@ function checkHardConsNine() {
   //The number of consecutive nightshifts is at most 3.
   var shifts = nurseShifts[0].length;
   var nurses = nurseShifts.length;
-  let consFailed = 0;
+  var consFailed = 0;
 
   for(var oneNurse = 0; oneNurse < nurses; oneNurse++){
-    let consecutiveNightShifts = 0;
+    var consecutiveNightShifts = 0;
     for(var oneShift = 0; oneShift < shifts; oneShift++){ 
       if (oneShift % 4 == 3){
         if (nurseShifts[oneNurse][oneShift] === 1){
@@ -406,11 +406,11 @@ function checkHardConsTen() {
   //The number of consecutive shifts (workdays) is at most 6
   var shifts = nurseShifts[0].length;
   var nurses = nurseShifts.length;
-  let consFailed = 0;  
+  var consFailed = 0;  
 
   for(var oneNurse = 0; oneNurse < nurses; oneNurse++){
-    let hasDayShift = false;
-    let consecutiveDays = 0;
+    var hasDayShift = false;
+    var consecutiveDays = 0;
 
     for(var oneShift = 0; oneShift < shifts; oneShift++){ 
 
@@ -446,7 +446,7 @@ function checkHardConsTen() {
  *  Iteratory dla pętli for:
  *  @nurse - aktualna pielęgniarka
  *  @shift - aktualna zmiana
- * "1.For the period of Friday 22:00 to Monday 0:00 a nurse should have either no shifts or at least 2 shifts (‘Complete Weekend’)."
+ * "1.For the period of Friday 22:00 to Monday 0:00 a nurse should have either no shifts or at least 2 shifts (‘Compvare Weekend’)."
  */
 function checkSoftConstOne()
 {
@@ -454,14 +454,15 @@ function checkSoftConstOne()
     const nurses = nurseShifts.lenght;
     var numberOfBrokenConstraints = 0;
 
-    for(let nurse = 0; nurse < nurses; nurse++)
+    for(var nurse = 0; nurse < nurses; nurse++)
     {
         //Zaczynam od zmiany "późnej" ponieważ kończy się o 23
-        for(let shift = 18; shift < shifts; shift += 28)
+        for(var shift = 18; shift < shifts; shift += 28)
         {
-            let sum = 0;
+            var begin = shift;
+            var sum = 0;
             //sprawdzam czy w okresie od zmiany "późnej" w piątek do nocnej w niedziele ta konkretna pielęgniarka pracuje 
-            for(let i = shift; i < 10; i++) sum += nurseShifts[nurse][i];
+            for(var i = begin; i < (begin + 10); i++) sum += nurseShifts[nurse][i];
             //Jeśli liczba jej zmian jest różna od 0(zera) i mniejsza od 2 to ograniczenie zostaje złamane
             if((sum != 0) && (sum < 2)) numberOfBrokenConstraints++ ;
         }
@@ -482,10 +483,10 @@ function checkSoftConstTwo()
     var sum = 0;
     var subSum = 0;
     var nursesWithAvailabilty = 12 //nurses with availability of <30, 48> hours per week <0, 12>
-    for(let nurse = 0; nurse <= nursesWithAvailabilty; nurse++)
+    for(var nurse = 0; nurse <= nursesWithAvailabilty; nurse++)
     {
         //Zaczynam od poniedziałkowej zmiany nocnej i kieruję się do niedzielnej zmiany nocnej zeby sprawdzić ile razy pielęgniarka ma zmianę nocną
-        for(let shift = 3; shift < shifts; shift += 24)
+        for(var shift = 3; shift < shifts; shift += 24)
         {
             sum = 0;
             //Tutaj sprawdzam każdą zmianę nocną z kolei
@@ -514,10 +515,10 @@ function checkSoftConstThree()
     var numberOfBrokenConstraints = 0;
     var nursesWithAvailabilty = 12 //nurses with availability of <30, 48> hours per week <0, 12>
 
-    for(let nurse = 0; nurse <= nursesWithAvailabilty; nurse++)
+    for(var nurse = 0; nurse <= nursesWithAvailabilty; nurse++)
     {
         //Zaczynam od poniedziałkowej zmiany dziennej i kończę na nocnej niedzielnej
-        for(let shift = 0; shift < shifts; shift += 28)
+        for(var shift = 0; shift < shifts; shift += 28)
         {
             //Przy rozpocząeciu każdego tygodnia zeruję sumę.
             sum = 0;
@@ -550,7 +551,7 @@ function checkSoftConstFor()
     var workDays = 0; //dni które upłyneły od ostatnio przerwanej seri zmian
     var restDays = 0;
     //ta pętla porusza się po pielęgniarkach
-    for(let nurse = 0; nurse < nurses; nurse++)
+    for(var nurse = 0; nurse < nurses; nurse++)
     {
         while(shift < shifts)
         {
@@ -593,15 +594,15 @@ function checkSoftConstFive()
     const nurses = nurseShifts.lenght;
     var numberOfBrokenConstraints = 0;
     var sum = 0;
-    for(let nurse = 0; nurse < nurses; nurse++)
+    for(var nurse = 0; nurse < nurses; nurse++)
     {
         //Zaczynam od zmiany późnej i kieruję się 3 kolejne dni na przód żeby sprawdzić ile razy pielęgniarka ma zmianę późną
-        for(let shift = 2; shift < shifts; shift += 12)
+        for(var shift = 2; shift < shifts; shift += 12)
         {
             //Ta seria może wystąpić bespośrednio przed następną więc resetujemy sumę.
             sum = 0;
             //Tutaj sprawdzam każdą zmianę wieczorną z kolei
-            for(let i = shift; i <= (shift + 12); i += 4)
+            for(var i = shift; i <= (shift + 12); i += 4)
             {
                 //Jeśli pielęgniarka ma zmianę późną to inkrementuje sum
                 if(nurseShifts[nurse][i] === 1) sum++;
