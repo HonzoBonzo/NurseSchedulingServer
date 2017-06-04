@@ -48,7 +48,7 @@ module.exports = {
 function getConstraints(req, res, next) {
   const mockConstraints = [
     { 
-      failedHardSum: countTotal[0],
+      failedHardSum: countTotal()[0],
       failedHards: [
         checkHardConsOne(),
         checkHardConsTwo(),
@@ -63,7 +63,7 @@ function getConstraints(req, res, next) {
       ]
     },
     {
-      failedSoftSum: countTotal[1],
+      failedSoftSum: countTotal()[1],
       failedSofts: [
         checkSoftConstOne(),
         checkSoftConstTwo(),
@@ -80,26 +80,23 @@ function getConstraints(req, res, next) {
 
 function countTotal() {
   return [
-    (      
-      checkHardConsOne() + 
-      checkHardConsTwo() + 
-      checkHardConsThree() + 
-      checkHardConsFour() + 
-      checkHardConsFive() + 
-      checkHardConsSix() + 
-      checkHardConsSeven() + 
-      checkHardConsEight() + 
-      checkHardConsNine() + 
-      checkHardConsTen()
-    ),
-    (
-      checkSoftConstOne() + 
-      checkSoftConstTwo() + 
-      checkSoftConstThree() + 
-      checkSoftConstFor() + 
-      checkSoftConstFive() + 
-      checkSoftConstSix()
-    )
+    checkHardConsOne() + 
+    checkHardConsTwo() + 
+    checkHardConsThree() + 
+    checkHardConsFour() + 
+    checkHardConsFive() + 
+    checkHardConsSix() + 
+    checkHardConsSeven() + 
+    checkHardConsEight() + 
+    checkHardConsNine() + 
+    checkHardConsTen()
+    ,
+    checkSoftConstOne() + 
+    checkSoftConstTwo() + 
+    checkSoftConstThree() + 
+    checkSoftConstFor() + 
+    checkSoftConstFive() + 
+    checkSoftConstSix()    
   ];
 }
 
