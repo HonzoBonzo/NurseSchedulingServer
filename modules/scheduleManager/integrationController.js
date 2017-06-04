@@ -10,15 +10,24 @@ module.exports = {
 
 function saveFirstWeek(req, res, next) {
     console.log('saving file...');
-    const week = req.body.week 
-    fs.writeFile('firstWeek.txt', week, 'utf8', function(err) {});
-    res.send(req.body);
+    var week = req.body.week.slice(1, -1);
+    week = _.replace(week, /\\r\\n/g, '\r\n');
+
+    fs.writeFile('firstWeek.txt', week, 'utf8', function(err) {
+        res.send(req.body);
+    });
 }
 
 function runAll(req, res, next) {
     console.log('running jar...');
-    var msg = {};
-    exec('java -jar ./nsp_2.0.jar');
-    msg = {code: 200, status: "OK"};
-    res.send(msg);
+    // var callback = (error, stdout, stderr) => {
+    //     var msg = {};
+    //     msg = {code: 200, status: "OK"};
+    //     if(!!!error) res.send(msg);
+    // };
+    exec('java -jar ./nsp_2.0.jar', (error, stdout, stderr) => {
+        var msg = {};
+        msg = {code: 200, status: "OK"};
+        res.send(msg);
+    });
 }
