@@ -42,13 +42,15 @@ var shiftDemandsPerDay = {
 };
 
 module.exports = {
-	getConstraints: getConstraints
+	getConstraints: getConstraints,
 }
 
 function getConstraints(req, res, next) {
   const mockConstraints = [
     { 
-      failedHardSum: countTotal()[0],
+      failedHardSum: checkHardConsOne() + checkHardConsTwo() + checkHardConsThree() +
+      checkHardConsFour() +  checkHardConsFive() + checkHardConsSix() + checkHardConsSeven() +
+      checkHardConsEight() + checkHardConsNine() + checkHardConsNine(),
       failedHards: [
         checkHardConsOne(),
         checkHardConsTwo(),
@@ -59,11 +61,17 @@ function getConstraints(req, res, next) {
         checkHardConsSeven(),
         checkHardConsEight(),
         checkHardConsNine(),
-        checkHardConsTen()
+        checkHardConsNine()
       ]
     },
     {
-      failedSoftSum: countTotal()[1],
+      failedSoftSum: 
+        checkSoftConstOne() +
+        checkSoftConstTwo() +
+        checkSoftConstThree() +
+        checkSoftConstFor() +
+        checkSoftConstFive() +
+        checkSoftConstSix(),
       failedSofts: [
         checkSoftConstOne(),
         checkSoftConstTwo(),
@@ -78,32 +86,10 @@ function getConstraints(req, res, next) {
   res.send(mockConstraints);
 }
 
-function countTotal() {
-  return [
-    checkHardConsOne() + 
-    checkHardConsTwo() + 
-    checkHardConsThree() + 
-    checkHardConsFour() + 
-    checkHardConsFive() + 
-    checkHardConsSix() + 
-    checkHardConsSeven() + 
-    checkHardConsEight() + 
-    checkHardConsNine() + 
-    checkHardConsTen()
-    ,
-    checkSoftConstOne() + 
-    checkSoftConstTwo() + 
-    checkSoftConstThree() + 
-    checkSoftConstFor() + 
-    checkSoftConstFive() + 
-    checkSoftConstSix()    
-  ];
-}
-
-
 function getShifts(){
-  const filePath = 'tab.txt';
+  const filePath = 'tab.txt'
   var digitRows = [];
+
   var test = fs.readFile(filePath, 'utf8', function(err, data) {
 		if (err) {throw err;}
     var rows = data.split("\n", 2000);    
@@ -121,14 +107,14 @@ function getShifts(){
 }
 
 function checkHardConsOne() {
-  var shifts = nurseShifts[0].length;
-  var nurses = nurseShifts.length;  
+  const shifts = nurseShifts[0].length;
+  const nurses = nurseShifts.length;  
   var consFailed = 0;
   var day = 0;
 
   for(var oneShift = 0; oneShift < shifts; oneShift++){
     var nursePerShift = 0;
-    if ((oneShift % 4 == 0) && (oneShift != 0)){
+    if ((oneShift % 4 === 0) && (oneShift !== 0)){
       day++;
     }
 
@@ -138,8 +124,7 @@ function checkHardConsOne() {
       }
     }
     
-
-    if (shiftDemandsPerDay[day % 7][oneShift % 4] != nursePerShift){
+    if (shiftDemandsPerDay[day % 7][oneShift % 4] !== nursePerShift){
       consFailed++;
     }
   }
@@ -147,8 +132,8 @@ function checkHardConsOne() {
 }
 
 function checkHardConsTwo() {
-  var shifts = nurseShifts[0].length;
-  var nurses = nurseShifts.length;
+  const shifts = nurseShifts[0].length;
+  const nurses = nurseShifts.length;
   var consFailed = 0;
 
   for(var oneNurse = 0; oneNurse < nurses; oneNurse++){
