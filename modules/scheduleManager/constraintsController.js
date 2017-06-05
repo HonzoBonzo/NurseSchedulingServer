@@ -2,7 +2,19 @@ var express = require('express');
 var _ = require('lodash');
 var scheduleService = require('./scheduleService');
 var fs = require('fs');
-var nurseShifts = getShifts();
+var nurseShifts = [];
+
+function _stringToTable(string) {
+	var rows = _.split(string, '\r\n', 10000);
+	rows = _.map(rows, row => {
+		return _.split(row, ' ', 168).map(el => Number(el));
+	});
+	return rows;
+}
+
+function simpleGetShifts() {
+  return _stringToTable(fs.readFileSync('tab.txt', 'utf8'))
+}
 
 var shiftDemandsPerDay = {
   0: {0: 3,
@@ -46,7 +58,13 @@ module.exports = {
 }
 
 function getConstraints(req, res, next) {
-  const mockConstraints = [
+  console.log("checking constraints...")
+  nurseShifts = simpleGetShifts();
+  res.send(getConsCounted());
+}
+
+function getConsCounted(cb) {
+  return [
     { 
       failedHardSum: checkHardConsOne() + checkHardConsTwo() + checkHardConsThree() +
       checkHardConsFour() +  checkHardConsFive() + checkHardConsSeven() +
@@ -82,29 +100,28 @@ function getConstraints(req, res, next) {
       ]
     }
   ];
-  
-  res.send(mockConstraints);
 }
 
-function getShifts(){
-  const filePath = 'tab.txt'
-  var digitRows = [];
+// look simpleGetShifts()
+// function getShifts(){
+//   const filePath = 'tab.txt'
+//   var digitRows = [];
 
-  var test = fs.readFile(filePath, 'utf8', function(err, data) {
-		if (err) {throw err;}
-    var rows = data.split("\n", 2000);    
+//   var test = fs.readFileSync(filePath, 'utf8', function(err, data) {
+// 		if (err) {throw err;}
+//     var rows = data.split("\n", 2000);    
 
-    for (var rowIndex = 0; rowIndex < rows.length; rowIndex++) {
-      var oneRow = rows[rowIndex].split(" ", 200);
-      digitRows[rowIndex] = [];
+//     for (var rowIndex = 0; rowIndex < rows.length; rowIndex++) {
+//       var oneRow = rows[rowIndex].split(" ", 200);
+//       digitRows[rowIndex] = [];
 
-      for(var colIndex = 0; colIndex < oneRow.length - 1; colIndex++){
-        digitRows[rowIndex][colIndex] = parseInt(oneRow[colIndex]);        
-      }
-    }
-	});
-  return digitRows
-}
+//       for(var colIndex = 0; colIndex < oneRow.length - 1; colIndex++){
+//         digitRows[rowIndex][colIndex] = parseInt(oneRow[colIndex]);        
+//       }
+//     }
+// 	});
+//   return digitRows
+// }
 
 function checkHardConsOne() {
   const shifts = nurseShifts[0].length;
