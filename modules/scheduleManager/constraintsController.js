@@ -167,7 +167,7 @@ function checkHardConsThree() {
     if (_getHoursFromTable(oneNurse, 0, shifts - 28) > _getAllowedHours(oneNurse)){
       consFailed++;
     }
-    if (_getHoursFromTable(oneNurse, 27, shifts) > _getAllowedHours(oneNurse)){
+    if (_getHoursFromTable(oneNurse, 28, shifts) > _getAllowedHours(oneNurse)){
       consFailed++;
     }
   }
@@ -182,17 +182,15 @@ function checkHardConsFour() {
   
   for(var oneNurse = 0; oneNurse < nurses; oneNurse++){
     if(_getNumberOfNightShifts(oneNurse,0,shifts - 28) > 3){
-      //res.send(String(oneNurse));
       consFailed++;
     }
-    if(_getNumberOfNightShifts(oneNurse,27,shifts) > 3){
+    if(_getNumberOfNightShifts(oneNurse,28,shifts) > 3){
       consFailed++;
-      //res.send(String(oneNurse));
     }
   }
-  //res.send(String(consFailed));
   return consFailed;
 }
+
 
 function checkHardConsFive() {
   /*    A nurse must receive at least 2 weekends off duty per 5 week period. A weekend
