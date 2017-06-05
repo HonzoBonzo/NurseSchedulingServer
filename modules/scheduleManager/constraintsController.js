@@ -49,8 +49,8 @@ function getConstraints(req, res, next) {
   const mockConstraints = [
     { 
       failedHardSum: checkHardConsOne() + checkHardConsTwo() + checkHardConsThree() +
-      checkHardConsFour() +  checkHardConsFive() + checkHardConsSix() + checkHardConsSeven() +
-      checkHardConsEight() + checkHardConsNine() + checkHardConsNine(),
+      checkHardConsFour() +  checkHardConsFive() + checkHardConsSeven() +
+      checkHardConsEight() + checkHardConsNine() + checkHardConsTen(),
       failedHards: [
         checkHardConsOne(),
         checkHardConsTwo(),
@@ -61,7 +61,7 @@ function getConstraints(req, res, next) {
         checkHardConsSeven(),
         checkHardConsEight(),
         checkHardConsNine(),
-        checkHardConsNine()
+        checkHardConsTen()
       ]
     },
     {
@@ -192,17 +192,6 @@ function checkHardConsFour() {
   }
   //res.send(String(consFailed));
   return consFailed;
-}
-
-function _getNumberOfNightShifts(nurse, from, to){
-  var nightShifts = 0;
-
-  for(var oneShift = from; oneShift < to; oneShift++){
-    if ((oneShift % 4 === 3) && (nurseShifts[nurse][oneShift] === 1)){
-      nightShifts++;
-    }
-  }
-  return nightShifts;
 }
 
 function checkHardConsFive() {
@@ -436,293 +425,17 @@ function _getRestShiftsDuring24(nurse, startShift){
   return restShifts;
 }
 
-function checkHardConsThree() {
-  /* Within a scheduling period a nurse is allowed to exceed the number of hours 
-  for which they are available for their department by at most 4 hours. */
-  var shifts = nurseShifts[0].length;
-  var nurses = nurseShifts.length;  
-  var consFailed = 0;
-
-  for(var oneNurse = 0; oneNurse < nurses; oneNurse++){
-
-    if (_getHoursFromTable(oneNurse, 0, shifts - 28) > _getAllowedHours(oneNurse)){
-      consFailed++;
-    }
-    if (_getHoursFromTable(oneNurse, 27, shifts) > _getAllowedHours(oneNurse)){
-      consFailed++;
-    }
-  }
-  return consFailed;
-}
-
-function _getHoursFromTable(nurse, from, to){
-  var nurseHours = 0;
-
-  for(var oneShift = from; oneShift < to; oneShift++){
-    if (nurseShifts[nurse][oneShift] == 1){
-      nurseHours += 8;
-    }
-  }
-
-  return nurseHours;
-}
-
-function _getAllowedHours(nurse){
-  var nurseHours = 0;
-    
-    switch (nurse){
-      case 0: case 1: case 2: case 3: case 4: case 5: 
-      case 6: case 7: case 8: case 9: case 10: case 11:
-        return 184;
-      case 12:
-        return 164;
-      case 13: case 14: case 15:
-        return 104;
-      default:
-        throw err;
-    }
-}
-
-function checkHardConsFour() {
-  //The maximum number of night shifts is 3 per period of 5 consecutive weeks.
-  var shifts = nurseShifts[0].length;
-  var nurses = nurseShifts.length;
-  var consFailed = 0;
-  
-  for(var oneNurse = 0; oneNurse < nurses; oneNurse++){
-    if(_getNumberOfNightShifts(oneNurse,0,shifts - 28) > 3){
-      consFailed++;
-    }
-    if(_getNumberOfNightShifts(oneNurse,27,shifts) > 3){
-      consFailed++;
-    }
-  }
-  return consFailed;
-}
-
 function _getNumberOfNightShifts(nurse, from, to){
   var nightShifts = 0;
 
   for(var oneShift = from; oneShift < to; oneShift++){
-    if ((oneShift % 4 == 3) && (nurseShifts[nurse][oneShift] == 1)){
+    if ((oneShift % 4 === 3) && (nurseShifts[nurse][oneShift] === 1)){
       nightShifts++;
     }
   }
   return nightShifts;
 }
 
-function checkHardConsFive() {
-  /*    A nurse must receive at least 2 weekends off duty per 5 week period. A weekend
-        off duty lasts 60 hours including Saturday 00:00 to Monday 04:00.           */
-  var shifts = nurseShifts[0].length;
-  var nurses = nurseShifts.length;
-  var consFailed = 0;
-  
-
-  for(var oneNurse = 0; oneNurse < nurses; oneNurse++){
-    if(_getCountWeeksOfDuty(oneNurse,28,shifts) < 2){
-      consFailed++;
-    }
-
-    if(_getCountWeeksOfDuty(oneNurse,0,shifts-27) < 2){
-      consFailed++;
-    }
-  }
-  return consFailed;
-}
-
-function _getCountWeeksOfDuty(nurse, from, to){
-  var weeksOfDuty = 0;
-    for(var oneShift = 19 + from; oneShift < to; oneShift += 28){
-      if(_isWeekOfDuty(nurse, oneShift)){
-        weeksOfDuty++
-      }
-    }
-    return weeksOfDuty;
-}
-
-function _isWeekOfDuty(nurse, startShift){
-  for(var oneShift = startShift; oneShift < startShift + 9; oneShift++){
-    if(nurseShifts[nurse][oneShift] != 0){
-      return false;
-    }
-  }
-  return true;
-}
-
-function checkHardConsSix() {
-  // Following a series of at least 2 consecutive night shifts a 42 hours rest is required.
-  var shifts = nurseShifts[0].length;
-  var nurses = nurseShifts.length;
-  var consFailed = 0;
-  var isRestPeriod = false;
-  
-  for(var oneNurse = 0; oneNurse < nurses; oneNurse++){
-    var consecutiveNightShifts = 0;
-    var consecutiveRestShifts = 0;
-
-    for(var oneShift = 0; oneShift < shifts; oneShift++){
-      if (isRestPeriod){
-        if (nurseShifts[oneNurse][oneShift] == 0){
-          consecutiveRestShifts++;
-        }else{
-          if(consecutiveRestShifts < 8){
-            consFailed++;
-          }
-          isRestPeriod = false;         
-        }
-      }
-      
-      if (oneShift % 4 == 3){
-        if (nurseShifts[oneNurse][oneShift] === 1){
-          consecutiveNightShifts++;
-        }else{
-          if(consecutiveNightShifts > 1){
-            isRestPeriod = true;
-            oneShift -= 4;
-          }
-          consecutiveNightShifts = 0;
-        }        
-      }
-    }
-    
-  }
-  return consFailed;
-}
-
-function checkHardConsSeven() {
-  //During any period of 24 consecutive hours, at least 11 hours of rest is required.
-  var shifts = nurseShifts[0].length;
-  var nurses = nurseShifts.length;
-  var consFailed = 0;
-
-  for(var oneNurse = 0; oneNurse < nurses; oneNurse++){
-    for(var oneShift = 0; oneShift < shifts - 3; oneShift++){
-      if(_getRestShiftsDuring24(oneNurse,oneShift) < 2){
-        consFailed++;
-      }
-    }
-  }
-
-  return consFailed;
-}
-
-function _getRestShiftsDuring24(nurse, startShift){
-  var restShifts = 0;
-  for(var oneShift = startShift; oneShift < startShift + 4; oneShift++){
-    if (nurseShifts[nurse][oneShift] == 0){
-      restShifts++;
-    }
-  }
-  return restShifts;
-}
-
-function checkHardConsEight(){
-// A night shift has to be followed by at least 14 hours rest. An exception is that once in a
-// period of 21 days for 24 consecutive hours, the resting time may be reduced to 8 hours.
-var shifts = nurseShifts[0].length;
-  var nurses = nurseShifts.length;
-  var day = 0;
-  var consFailed = 0;
-
-  for(var oneNurse = 0; oneNurse < nurses; oneNurse++){
-    var isExcepAvaible = true;
-    var dayOfException = 0;
-
-    for(var oneShift = 3; oneShift < shifts - 4; oneShift+=4, day++){
-      if ((dayOfException != 0) && (day-dayOfException > 21)){
-        isExcepAvaible = true;
-        dayOfException = 0;
-      }
-
-      if(nurseShifts[oneNurse][oneShift] == 1){
-        var restShifts = _getRestShifts(oneNurse, oneShift);
-        if(restShifts < 2){
-          if (isExcepAvaible){
-            if(restShifts < 1){
-              consFailed++;
-            }
-            isExcepAvaible = false;
-            dayOfException = day;
-          }else{
-            consFailed++;
-          }
-        }
-      }
-    }
-  }
-  return consFailed;
-}
-
-function _getRestShifts(nurse, startShift){
-  var restShifts = 0;
-  for(var oneShift = startShift + 1; oneShift < startShift + 4; oneShift++){
-    if (nurseShifts[nurse][oneShift] == 0){
-      restShifts++;
-    }else{
-      break;
-    }
-  }
-  return restShifts;
-}
-
-function checkHardConsNine() {
-  //The number of consecutive nightshifts is at most 3.
-  var shifts = nurseShifts[0].length;
-  var nurses = nurseShifts.length;
-  var consFailed = 0;
-
-  for(var oneNurse = 0; oneNurse < nurses; oneNurse++){
-    var consecutiveNightShifts = 0;
-    for(var oneShift = 0; oneShift < shifts; oneShift++){ 
-      if (oneShift % 4 == 3){
-        if (nurseShifts[oneNurse][oneShift] === 1){
-          consecutiveNightShifts++;          
-        }else{
-          if (consecutiveNightShifts > 3){
-            consFailed++;
-          }
-          consecutiveNightShifts = 0;
-        } 
-      }
-    }
-  }
-  return consFailed;
-}
-
-function checkHardConsTen() {
-  //The number of consecutive shifts (workdays) is at most 6
-  var shifts = nurseShifts[0].length;
-  var nurses = nurseShifts.length;
-  var consFailed = 0;  
-
-  for(var oneNurse = 0; oneNurse < nurses; oneNurse++){
-    var hasDayShift = false;
-    var consecutiveDays = 0;
-
-    for(var oneShift = 0; oneShift < shifts; oneShift++){ 
-
-      if ((oneShift % 4 == 0) && (oneShift != 0)){
-
-        if (hasDayShift){
-          consecutiveDays++;
-          hasDayShift = false;
-        }else{
-
-          if(consecutiveDays > 6){
-            consFailed++;
-          }
-          consecutiveDays = 0;
-        }
-      }
-
-      if (nurseShifts[oneNurse][oneShift] == 1){
-        hasDayShift = true;
-      }
-    }
-  }
-  return consFailed;
-}
 /*
  * Arkadiusz Bontur
  *
