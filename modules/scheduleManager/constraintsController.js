@@ -60,7 +60,8 @@ module.exports = {
 function getConstraints(req, res, next) {
   console.log("checking constraints...")
   nurseShifts = simpleGetShifts();
-  res.send(getConsCounted());
+  var response = getConsCounted(); 
+  setTimeout(() => { res.send(response) }, 4000);
 }
 
 function getConsCounted(cb) {
