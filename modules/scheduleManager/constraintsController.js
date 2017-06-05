@@ -61,7 +61,7 @@ function getConstraints(req, res, next) {
   console.log("checking constraints...")
   nurseShifts = simpleGetShifts();
   var response = getConsCounted(); 
-  setTimeout(() => { res.send(response) }, 4000);
+  res.send(response);
 }
 
 function getConsCounted(cb) {
