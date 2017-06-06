@@ -11,11 +11,11 @@ function writeFile(string) {
 
 function parseFile(string) {
     var res = string;
-    res = _.replace(res, /1/g, '1 0 0 0');
-    res = _.replace(res, /2/g, '0 1 0 0');
-    res = _.replace(res, /3/g, '0 0 1 0');
-    res = _.replace(res, /4/g, '0 0 0 1');
-    res = _.replace(res, /5/g, '0 0 0 0');
+    res = _.replace(res, /1/g, '0 1 0 0'); //E
+    res = _.replace(res, /2/g, '1 0 0 0'); //D
+    res = _.replace(res, /3/g, '0 0 1 0'); //L
+    res = _.replace(res, /4/g, '0 0 0 1'); //N
+    res = _.replace(res, /5/g, '0 0 0 0'); //R
     return res;
 }
 
