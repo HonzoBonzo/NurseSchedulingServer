@@ -25,7 +25,7 @@ function runAll(req, res, next) {
     //     msg = {code: 200, status: "OK"};
     //     if(!!!error) res.send(msg);
     // };
-    exec('java -jar ./nsp_2.0.jar', (error, stdout, stderr) => {
+    exec('java -jar ./nsp_3.0.jar', (error, stdout, stderr) => {
         var msg = {};
         msg = {code: 200, status: "OK"};
         res.send(msg);
