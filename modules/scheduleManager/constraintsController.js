@@ -4,6 +4,19 @@ var scheduleService = require('./scheduleService');
 var fs = require('fs');
 var nurseShifts = [];
 
+module.exports = {
+	getConstraints: getConstraints,
+}
+
+function getConstraints(req, res, next) {
+  console.log("checking constraints...")
+  var cb = res => { getConsCounted(res) }
+  simpleGetShifts(res, cb);
+  // nurseShifts = simpleGetShifts(res, cb);
+  //var response = getConsCounted(res); 
+  //res.send(response);
+}
+
 function _stringToTable(string) {
 	var rows = _.split(string, '\r\n', 10000);
 	rows = _.map(rows, row => {
@@ -12,11 +25,12 @@ function _stringToTable(string) {
 	return rows;
 }
 
-function simpleGetShifts() {
-  return _stringToTable(fs.readFileSync('tab.txt', 'utf8'))
+function simpleGetShifts(res, cb) {
+  nurseShifts = _stringToTable(fs.readFileSync('tab.txt', 'utf8'));
+  cb(res);
 }
 
-var shiftDemandsPerDay = {
+const shiftDemandsPerDay = {
   0: {0: 3,
       1: 3,
       2: 3,
@@ -53,23 +67,10 @@ var shiftDemandsPerDay = {
       3: 1,}
 };
 
-module.exports = {
-	getConstraints: getConstraints,
-}
-
-function getConstraints(req, res, next) {
-  console.log("checking constraints...")
-  nurseShifts = simpleGetShifts();
-  var response = getConsCounted(); 
-  res.send(response);
-}
-
-function getConsCounted(cb) {
-  return [
+function getConsCounted(res) {
+  res.send([
     { 
-      failedHardSum: checkHardConsOne() + checkHardConsTwo() + checkHardConsThree() +
-      checkHardConsFour() +  checkHardConsFive() + checkHardConsSeven() +
-      checkHardConsEight() + checkHardConsNine() + checkHardConsTen(),
+      failedHardSum: getFailedHardSum(),
       failedHards: [
         checkHardConsOne(),
         checkHardConsTwo(),
@@ -84,13 +85,7 @@ function getConsCounted(cb) {
       ]
     },
     {
-      failedSoftSum: 
-        checkSoftConstOne() +
-        checkSoftConstTwo() +
-        checkSoftConstThree() +
-        checkSoftConstFor() +
-        checkSoftConstFive() +
-        checkSoftConstSix(),
+      failedSoftSum: getFailedSoftSum(),
       failedSofts: [
         checkSoftConstOne(),
         checkSoftConstTwo(),
@@ -100,29 +95,30 @@ function getConsCounted(cb) {
         checkSoftConstSix()
       ]
     }
-  ];
+  ]);
 }
 
-// look simpleGetShifts()
-// function getShifts(){
-//   const filePath = 'tab.txt'
-//   var digitRows = [];
+function getFailedHardSum() {
+  return checkHardConsOne() + 
+    checkHardConsTwo() + 
+    checkHardConsThree() +
+    checkHardConsFour() + 
+    checkHardConsFive() + 
+    checkHardConsSix() +
+    checkHardConsSeven() +
+    checkHardConsEight() + 
+    checkHardConsNine() + 
+    checkHardConsTen();
+}
 
-//   var test = fs.readFileSync(filePath, 'utf8', function(err, data) {
-// 		if (err) {throw err;}
-//     var rows = data.split("\n", 2000);    
-
-//     for (var rowIndex = 0; rowIndex < rows.length; rowIndex++) {
-//       var oneRow = rows[rowIndex].split(" ", 200);
-//       digitRows[rowIndex] = [];
-
-//       for(var colIndex = 0; colIndex < oneRow.length - 1; colIndex++){
-//         digitRows[rowIndex][colIndex] = parseInt(oneRow[colIndex]);        
-//       }
-//     }
-// 	});
-//   return digitRows
-// }
+function getFailedSoftSum() {
+  return checkSoftConstOne() +
+    checkSoftConstTwo() +
+    checkSoftConstThree() +
+    checkSoftConstFor() +
+    checkSoftConstFive() +
+    checkSoftConstSix();
+}
 
 function checkHardConsOne() {
   const shifts = nurseShifts[0].length;
