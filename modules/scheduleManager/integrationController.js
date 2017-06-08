@@ -22,7 +22,7 @@ function saveFirstWeek(req, res, next) {
 
 function runAll(req, res, next) {
     console.log('running jar...');
-    exec('java -jar ./nsp_3.0.jar', (error, stdout, stderr) => {
+    exec('java -jar ./nsp_4.0.jar', (error, stdout, stderr) => {
         var msg = {};
         msg = {code: 200, status: "OK"};
         res.send(msg);
