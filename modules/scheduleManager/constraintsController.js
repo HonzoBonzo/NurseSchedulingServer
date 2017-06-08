@@ -304,17 +304,18 @@ function checkHardConsEight(){
       }
 
       if(nurseShifts[oneNurse][oneShift] === 1){
-        if((nurseShifts[oneNurse][oneShift - 1] === 1) && (nurseShifts[oneNurse][oneShift - 2] === 1)){
-          consFailed++;
-        }else if((nurseShifts[oneNurse][oneShift - 1] === 1) && (nurseShifts[oneNurse][oneShift - 3] === 1)){
-          consFailed++;
-        }else if(nurseShifts[oneNurse][oneShift - 1] === 1){
+        if((nurseShifts[oneNurse][oneShift + 1] === 1) && 
+        (nurseShifts[oneNurse][oneShift + 2] === 0)){
           if (isExcepAvaible){
             isExcepAvaible = false;
             dayOfException = day;
           }else{
             consFailed++;
           }          
+        }else if((nurseShifts[oneNurse][oneShift + 1] === 1) ||
+         (nurseShifts[oneNurse][oneShift + 2] === 1) ||
+         (nurseShifts[oneNurse][oneShift + 3] === 1)){
+            consFailed++;
         }
       }
     }
