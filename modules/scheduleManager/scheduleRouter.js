@@ -10,6 +10,10 @@ scheduleManagerRouter.get('/nurses/', scheduleController.getNurses);
 scheduleManagerRouter.get('/days/', scheduleController.getDaysJson);
 scheduleManagerRouter.get('/constraints/', constraintsController.getConstraints);
 scheduleManagerRouter.get('/runAll/', integrationController.runAll);
+scheduleManagerRouter.get('/runJarAndExe/', integrationController.runJarAndExe);
+scheduleManagerRouter.get('/getStats/', integrationController.getStats);
+
+
 scheduleManagerRouter.post('/firstWeek/', integrationController.saveFirstWeek);
 
 module.exports = scheduleManagerRouter;

@@ -68,6 +68,7 @@ const shiftDemandsPerDay = {
 };
 
 function getConsCounted(res) {
+  console.log('sending constraints result...');
   res.send([
     { 
       failedHardSum: getFailedHardSum(),
@@ -392,7 +393,7 @@ function _getAllowedHours(nurse){
       case 13: case 14: case 15:
         return 104;
       default:
-        throw err;
+        return 184;
     }
 }
 

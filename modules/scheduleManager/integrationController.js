@@ -5,7 +5,9 @@ var fs = require('fs');
 
 module.exports = {
 	runAll: runAll,
-    saveFirstWeek: saveFirstWeek
+    saveFirstWeek: saveFirstWeek,
+    runJarAndExe: runJarAndExe,
+    getStats: getStats
 }
 
 function saveFirstWeek(req, res, next) {
@@ -20,14 +22,28 @@ function saveFirstWeek(req, res, next) {
 
 function runAll(req, res, next) {
     console.log('running jar...');
-    // var callback = (error, stdout, stderr) => {
-    //     var msg = {};
-    //     msg = {code: 200, status: "OK"};
-    //     if(!!!error) res.send(msg);
-    // };
     exec('java -jar ./nsp_3.0.jar', (error, stdout, stderr) => {
         var msg = {};
         msg = {code: 200, status: "OK"};
         res.send(msg);
     });
+}
+
+function runJarAndExe(req, res, next) {
+    console.log('running jar...');
+    exec('java -jar ./nsp_3.0.jar', (error, stdout, stderr) => {
+        console.log('running exe...');
+        exec('ACO.exe', (error, stdout, stderr) => {
+            var msg = {};
+            msg = {code: 200, status: "OK"};
+            res.send(msg);
+        })
+    });
+}
+
+function getStats(req, res, next) {
+    console.log('getting stats...');
+    fs.readFile('statistics.json', 'utf8', (err, data) => {
+        res.send(data);
+    })
 }
